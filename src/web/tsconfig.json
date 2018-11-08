@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "moduleResolution": "node",
+    "target": "es6",
+    "types": [
+      "vss-web-extension-sdk"
+    ]
+  },
+  "files": [
+    "tab.ts"
+  ]
+}

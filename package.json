@@ -1,0 +1,18 @@
+{
+  "name": "lighthouse-vsts",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "package": "npm run clean && npm run compile && tfx extension create --rev-version",
+    "clean": "rimraf ./*.vsix",
+    "compile": "tsc -p ./src/task && tsc -p ./src/web",
+    "postinstall": "npm run install-task-lib && npm run install-web-lib && npm run compile",
+    "install-task-lib": "cd src && cd task && npm install",
+    "install-web-lib": "cd src && cd web && npm install"
+  },
+  "devDependencies": {
+    "tfx-cli": "^0.6.3",
+    "typescript": "^2.6.1",
+    "rimraf": "^2.6.2"
+  }
+}

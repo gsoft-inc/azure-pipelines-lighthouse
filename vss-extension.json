@@ -1,0 +1,145 @@
+{
+  "manifestVersion": 1,
+  "id": "lighthouse-vsts",
+  "name": "Lighthouse",
+  "publisher": "AnthonySimmon",
+  "public": false,
+  "author": "Anthony Simmon",
+  "version": "0.1.132",
+  "description": "Embed Google Lighthouse HTML results in Azure Pipelines",
+  "galleryFlags": [
+    "Preview"
+  ],
+  "targets": [{
+    "id": "Microsoft.VisualStudio.Services"
+  }],
+  "scopes": [
+    "vso.build_execute",
+    "vso.release_execute"
+  ],
+  "icons": {
+    "default": "static/images/extension-logo.png"
+  },
+  "demands": [
+    "api-version/3.0"
+  ],
+  "tags": [
+    "Lighthouse",
+    "Build",
+    "Release",
+    "Azure Pipelines",
+    "Visual Studio Extensions"
+  ],
+  "categories": [
+    "Build and release",
+    "Pipelines"
+  ],
+  "screenshots": [{
+    "path": "static/images/screenshot-1.png"
+  }, {
+    "path": "static/images/screenshot-2.png"
+  }],
+  "content": {
+    "license": {
+      "path": "LICENSE"
+    }
+  },
+  "branding": {
+    "color": "rgb(220, 235, 252)",
+    "theme": "light"
+  },
+  "files": [
+    {
+      "path": "static/images/extension-logo.png",
+      "packagePath": "images/extension-logo.png",
+      "addressable": true
+    },
+    {
+      "path": "static/images/screenshot-1.png",
+      "packagePath": "images/screenshot-1.png",
+      "addressable": true
+    },
+    {
+      "path": "static/images/screenshot-2.png",
+      "packagePath": "images/screenshot-2.png",
+      "addressable": true
+    },
+    {
+      "path": "src/web/tab.js",
+      "packagePath": "scripts/tab.js",
+      "addressable": true
+    },
+    {
+      "path": "src/web/tab-build.html",
+      "packagePath": "tab-build.html",
+      "addressable": true
+    },
+    {
+      "path": "src/web/tab-release.html",
+      "packagePath": "tab-release.html",
+      "addressable": true
+    },
+    {
+      "path": "src/task/task.json",
+      "packagePath": "Tasks/Lighthouse/task.json",
+      "addressable": true
+    },
+    {
+      "path": "src/task/execute-lighthouse.js",
+      "packagePath": "Tasks/Lighthouse/execute-lighthouse.js",
+      "addressable": true
+    },
+    {
+      "path": "static/images/task-icon.png",
+      "packagePath": "Tasks/Lighthouse/icon.png",
+      "addressable": true
+    },
+    {
+      "path": "src/task/node_modules",
+      "packagePath": "Tasks/Lighthouse/node_modules",
+      "addressable": true
+    },
+    {
+      "path": "src/web/node_modules/vss-web-extension-sdk/lib",
+      "packagePath": "lib",
+      "addressable": true
+    }
+  ],
+  "contributions": [
+    {
+      "id": "build-lighthouse-tab",
+      "type": "ms.vss-build-web.build-results-tab",
+      "description": "Embed Lighthouse HTML result into a build tab",
+      "targets": ["ms.vss-build-web.build-results-view"],
+      "properties": {
+        "name": "Lighthouse",
+        "uri": "tab-build.html",
+        "registeredObjectId": "registeredEnvironmentObject",
+        "supportsTasks": ["b18196d0-d3ed-11e8-ada4-43a6658503da"],
+        "dynamic": true
+      },
+      "includes": ["ms.vss-releaseManagement-web.release-service-data-external"]
+    },
+    {
+      "id": "release-stage-lighthouse-tab",
+      "type": "ms.vss-web.tab",
+      "description": "Embed Lighthouse HTML result into a release stage tab",
+      "targets": [ "ms.vss-releaseManagement-web.release-environment-editor-tab" ],
+      "properties": {
+        "name": "Lighthouse",
+        "uri": "tab-release.html",
+        "registeredObjectId": "registeredEnvironmentObject",
+        "dynamic": true
+      },
+      "includes": ["ms.vss-releaseManagement-web.release-service-data-external"]
+    },
+    {
+      "id": "Lighthouse",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "Tasks/Lighthouse"
+      }
+    }
+  ]
+}

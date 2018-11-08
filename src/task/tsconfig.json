@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "types": [
+      "azure-pipelines-task-lib",
+      "node",
+      "q"
+    ]
+  },
+  "files": [
+    "execute-lighthouse.ts"
+  ]
+}
