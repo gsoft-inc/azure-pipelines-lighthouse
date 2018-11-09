@@ -4,7 +4,7 @@
   "friendlyName": "Lighthouse",
   "description": "Lighthouse",
   "author": "Anthony Simmon",
-  "helpMarkDown": "Embed Google Lighthouse HTML results in Azure Pipelines",
+  "helpMarkDown": "Embed Google Lighthouse HTML results in Azure Pipelines. You need to provide your own installation of the npm package lighthouse.",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -31,7 +31,7 @@
       "label": "URL",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "URL to execute Lighthouse against"
+      "helpMarkDown": "URL to execute Lighthouse against."
     },
     {
       "name": "args",
@@ -39,7 +39,7 @@
       "label": "CLI arguments",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "[CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse."
+      "helpMarkDown": "[CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse. One argument per line."
     },
     {
       "name": "cwd",
@@ -47,7 +47,7 @@
       "label": "Working Directory",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Location of your package.json where the lighthouse npm package is referenced. Defaults to the root of the repository."
+      "helpMarkDown": "Location of your package.json where the lighthouse npm package is installed. Defaults to the root of the repository."
     }
   ],
   "execution": {
