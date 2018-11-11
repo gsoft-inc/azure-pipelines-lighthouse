@@ -2,9 +2,84 @@
 
 import path = require('path');
 import fs = require('fs');
+import os = require('os');
 
 import taskLibrary = require('azure-pipelines-task-lib/task');
 import toolRunner = require('azure-pipelines-task-lib/toolrunner');
+
+export class AuditEvaluator {
+    private static readonly AuditRuleRegex = /^([a-z-]+)\s*([=>])\s*([0-9]+(\.[0-9]+)?)$/gi;
+
+    public static evaluate(report, auditRulesStr) {
+        report = report || {};
+        auditRulesStr = auditRulesStr || '';
+
+        let auditRuleStrArray = auditRulesStr
+            .split(/\r?\n/)
+            .map(rule => rule.trim())
+            .filter(rule => rule.length > 0);
+
+        let errors = [];
+
+        for (let auditRuleStr of auditRuleStrArray) {
+            try {
+                this.evaluateAuditRuleStr(report, auditRuleStr);
+            } catch (err) {
+                errors.push(err.message);
+            }
+        }
+
+        if (errors.length)
+            throw new Error(errors.join(os.EOL));
+    }
+
+    private static evaluateAuditRuleStr(report, auditRuleStr) {
+        let rule = AuditEvaluator.extractAuditRule(auditRuleStr);
+        let audit = AuditEvaluator.findAudit(report.audits, rule.name);
+        if (audit === null)
+            return;
+
+        let displayValue = audit.displayValue || '';
+        if (displayValue.length > 0)
+            displayValue = `, details: ${displayValue}`;
+
+        if (rule.operator === '=') {
+            if (audit !== rule.score)
+                throw new Error(`Expected ${rule.score} for audit "${rule.name}" score but got ${audit.score}${displayValue}`);
+        }
+        else if (rule.operator === '>') {
+            if (audit < rule.score)
+                throw new Error(`Expected at least ${rule.score} for audit "${rule.name}" score but got ${audit.score}${displayValue}`);
+        }
+    }
+
+    private static extractAuditRule(auditRuleStr: string) {
+        let matches = AuditEvaluator.AuditRuleRegex.exec(auditRuleStr);
+        if (!matches)
+            throw new Error(`Audit rule "${auditRuleStr}" is malformed`);
+
+        return {
+            name: matches[1],
+            operator: matches[2],
+            score: parseFloat(matches[3])
+        };
+    }
+
+    private static findAudit(audits: LH.ResultLite.Audit[], name: string) {
+        let audit = audits[name];
+        if (!audit)
+            throw new Error(`Could not find audit "${name}"`);
+
+        // Do not evaluate informative or not-applicable audits
+        if (typeof audit.score === 'undefined' || audit.score === null)
+            return null;
+
+        if (typeof audit.score === 'string')
+            audit.score = parseFloat(audit.score);
+
+        return audit;
+    }
+}
 
 export class LighthouseTask {
     private static readonly BaseReportName = "lighthouseresult";
@@ -14,6 +89,8 @@ export class LighthouseTask {
     private htmlReportPath: string;
     private jsonReportPath: string;
     private cliArgs: string[];
+    private evaluateAuditRules: boolean;
+    private auditRulesStr: string;
 
     private command: toolRunner.ToolRunner;
 
@@ -26,15 +103,17 @@ export class LighthouseTask {
             this.defineOutputReportPaths();
             this.defineCliArgs();
             this.defineLighthouseCommand();
+            this.defineEvaluateAuditRules();
 
             await this.executeLighthouse();
-
-            this.addLighthouseHtmlAttachment();
 
             this.readJsonReport();
             this.processCriticalAudits();
         } catch (err) {
             taskLibrary.setResult(taskLibrary.TaskResult.Failed, err.message);
+        } finally {
+            if (fs.existsSync(this.htmlReportPath))
+                this.addLighthouseHtmlAttachment();
         }
     }
 
@@ -101,6 +180,11 @@ export class LighthouseTask {
         throw new Error('npm package "lighthouse" is not installed globally or locally');
     }
 
+    private defineEvaluateAuditRules() {
+        this.evaluateAuditRules = taskLibrary.getBoolInput('evaluateAuditRules', false);
+        this.auditRulesStr = taskLibrary.getInput('auditRulesStr', false) || '';
+    }
+
     private getGlobalLighthouseExecPath(): string {
         let execPath = taskLibrary.which('lighthouse', false);
         return fs.existsSync(execPath) ? execPath : '';
@@ -135,7 +219,11 @@ export class LighthouseTask {
     }
 
     private processCriticalAudits() {
-        // do something with this.jsonReport
+        if (this.evaluateAuditRules) {
+            AuditEvaluator.evaluate(
+                this.jsonReport, this.auditRulesStr
+            );
+        }
     }
 }
 

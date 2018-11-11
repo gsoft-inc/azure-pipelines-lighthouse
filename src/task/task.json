@@ -42,6 +42,22 @@
       "helpMarkDown": "[CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse. One argument per line."
     },
     {
+      "name": "evaluateAuditRules",
+      "type": "boolean",
+      "label": "Enable audit score evaluation",
+      "defaultValue": "false",
+      "required": true,
+      "helpMarkDown": "Allow you to write audit score rules that will be evaluated. The task will fail if any rule fails."
+    },
+    {
+      "name": "auditRulesStr",
+      "type": "multiLine",
+      "label": "Audit rules",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "TODO"
+    },
+    {
       "name": "cwd",
       "type": "filePath",
       "label": "Working Directory",

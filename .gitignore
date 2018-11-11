@@ -105,3 +105,4 @@ jspm_packages/
 ### Project specific
 *.vsix
 src/**/*.js
+.taskkey
