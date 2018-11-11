@@ -55,7 +55,8 @@
       "label": "Audit rules",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "TODO"
+      "helpMarkDown": "TODO",
+      "visibleRule": "evaluateAuditRules=true"
     },
     {
       "name": "cwd",

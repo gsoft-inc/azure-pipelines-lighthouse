@@ -44,11 +44,11 @@ export class AuditEvaluator {
             displayValue = `, details: ${displayValue}`;
 
         if (rule.operator === '=') {
-            if (audit !== rule.score)
+            if (audit.score !== rule.score)
                 throw new Error(`Expected ${rule.score} for audit "${rule.name}" score but got ${audit.score}${displayValue}`);
         }
         else if (rule.operator === '>') {
-            if (audit < rule.score)
+            if (audit.score < rule.score)
                 throw new Error(`Expected at least ${rule.score} for audit "${rule.name}" score but got ${audit.score}${displayValue}`);
         }
     }
@@ -73,9 +73,6 @@ export class AuditEvaluator {
         // Do not evaluate informative or not-applicable audits
         if (typeof audit.score === 'undefined' || audit.score === null)
             return null;
-
-        if (typeof audit.score === 'string')
-            audit.score = parseFloat(audit.score);
 
         return audit;
     }
