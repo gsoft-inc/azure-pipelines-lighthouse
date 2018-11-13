@@ -6,11 +6,14 @@
     "package": "npm run clean && npm run compile && tfx extension create --rev-version",
     "clean": "rimraf ./*.vsix",
     "compile": "tsc -p ./src/task && tsc -p ./src/web",
-    "postinstall": "npm run install-task-lib && npm run install-web-lib && npm run compile",
-    "install-task-lib": "cd src && cd task && npm install",
-    "install-web-lib": "cd src && cd web && npm install"
+    "postinstall": "npm run install-task-lib && npm run compile",
+    "install-task-lib": "cd src && cd task && npm install"
+  },
+  "dependencies": {
+    "vss-web-extension-sdk": "^5.141.0"
   },
   "devDependencies": {
+    "@types/node": "^8.0.7",
     "tfx-cli": "^0.6.3",
     "typescript": "^2.6.1",
     "rimraf": "^2.6.2"

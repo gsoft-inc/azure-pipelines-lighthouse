@@ -100,7 +100,7 @@
       "addressable": true
     },
     {
-      "path": "src/web/node_modules/vss-web-extension-sdk/lib",
+      "path": "node_modules/vss-web-extension-sdk/lib",
       "packagePath": "lib",
       "addressable": true
     }

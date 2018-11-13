@@ -1,8 +1,0 @@
-{
-  "private": true,
-  "dependencies": {
-    "@types/jquery": "^2.0.34",
-    "@types/q": "0.0.32",
-    "vss-web-extension-sdk": "^5.141.0"
-  }
-}
