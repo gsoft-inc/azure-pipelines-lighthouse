@@ -1,0 +1,11 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "./node_modules/gts/tslint.json"
+  ],
+  "jsRules": {},
+  "rules": {
+    "indent": [true, "spaces", 2]
+  },
+  "rulesDirectory": []
+}

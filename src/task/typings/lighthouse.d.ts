@@ -1,11 +1,11 @@
 declare module 'lighthouse' {
-    import {IPromise} from "q";
+  import {IPromise} from "q";
 
-    const lighthouse: {
-        (url: string,
-         flags: object,
-         perfConfig: object): IPromise<object>;
-    };
+  const lighthouse: {
+    (url: string,
+     flags: object,
+     perfConfig: object): IPromise<object>;
+  };
 
-    export = lighthouse;
+  export = lighthouse;
 }
