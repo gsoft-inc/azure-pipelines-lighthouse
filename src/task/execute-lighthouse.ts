@@ -1,15 +1,13 @@
 import './typings/lhr-lite';
-
 import path = require('path');
 import fs = require('fs');
 import os = require('os');
 
 import taskLibrary = require('azure-pipelines-task-lib/task');
 import toolRunner = require('azure-pipelines-task-lib/toolrunner');
+import AuditRule from "./audit-rule";
 
 export class AuditEvaluator {
-  private static readonly AUDIT_RULE_REGEX = /^([a-z-]+)\s*([=>])\s*([0-9]+(\.[0-9]+)?)$/gi;
-
   static evaluate(report, auditRulesStr) {
     report = report || {};
     auditRulesStr = auditRulesStr || '';
@@ -35,8 +33,8 @@ export class AuditEvaluator {
   }
 
   private static evaluateAuditRuleStr(report, auditRuleStr) {
-    const rule = AuditEvaluator.extractAuditRule(auditRuleStr);
-    const audit = AuditEvaluator.findAudit(report.audits, rule.name);
+    const rule = AuditRule.fromString(auditRuleStr);
+    const audit = AuditEvaluator.findAudit(report.audits, rule.auditName);
     if (audit === null) {
       return;
     }
@@ -48,27 +46,14 @@ export class AuditEvaluator {
 
     if (rule.operator === '=') {
       if (audit.score !== rule.score) {
-        throw new Error(`Expected ${rule.score} for audit "${rule.name}" score but got ${audit.score}${displayValue}`);
+        throw new Error(`Expected ${rule.score} for audit "${rule.auditName}" score but got ${audit.score}${displayValue}`);
       }
     }
     else if (rule.operator === '>') {
       if (audit.score < rule.score) {
-        throw new Error(`Expected at least ${rule.score} for audit "${rule.name}" score but got ${audit.score}${displayValue}`);
+        throw new Error(`Expected at least ${rule.score} for audit "${rule.auditName}" score but got ${audit.score}${displayValue}`);
       }
     }
-  }
-
-  private static extractAuditRule(auditRuleStr: string) {
-    const matches = AuditEvaluator.AUDIT_RULE_REGEX.exec(auditRuleStr);
-    if (!matches) {
-      throw new Error(`Audit rule "${auditRuleStr}" is malformed`);
-    }
-
-    return {
-      name: matches[1],
-      operator: matches[2],
-      score: Number(matches[3])
-    };
   }
 
   private static findAudit(audits: LH.ResultLite.Audit[], name: string) {

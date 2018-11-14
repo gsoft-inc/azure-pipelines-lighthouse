@@ -5,7 +5,7 @@
   "scripts": {
     "package": "npm run clean && npm run compile && tfx extension create --rev-version",
     "clean": "rimraf ./*.vsix",
-    "compile": "tsc -p ./src/task && tsc -p ./src/web",
+    "compile": "tsc -b src/task src/web test/task",
     "postinstall": "npm run install-task-lib && npm run compile",
     "install-task-lib": "cd src && cd task && npm install"
   },
@@ -14,11 +14,12 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.5",
+    "@types/node": "^8.0.7",
     "gts": "^0.9.0",
     "mocha": "^5.2.0",
     "rimraf": "^2.6.2",
-    "@types/node": "^8.0.7",
     "tfx-cli": "^0.6.3",
+    "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "typescript": "^2.6.1"
   }
