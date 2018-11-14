@@ -1,7 +1,7 @@
 import "mocha";
-import assert = require("assert");
 
-import AuditRule from "../../src/task/audit-rule";
+import assert = require("assert");
+import { AuditRule } from "../../src/task/audit-rule";
 
 describe("AuditRule tests", () => {
   function assertRuleShouldThrow(auditRuleStr: string) {
@@ -22,7 +22,7 @@ describe("AuditRule tests", () => {
     assertRuleShouldThrow(" ");
   });
 
-  it('Malformed rule should throw', () => {
+  it("Malformed rule should throw", () => {
     assertRuleShouldThrow("a");
     assertRuleShouldThrow(">");
     assertRuleShouldThrow("0");
@@ -31,7 +31,7 @@ describe("AuditRule tests", () => {
     assertRuleShouldThrow(" a > 0 ");
   });
 
-  it('Valid integer rules', () => {
+  it("Valid integer rules", () => {
     assertRule("a = 0", "a", "=", 0);
     assertRule("a > 0", "a", ">", 0);
   });
@@ -41,7 +41,6 @@ describe("AuditRule tests", () => {
     assertRule("a > 0.5", "a", ">", 0.5);
     assertRule("a > 0.33", "a", ">", 0.33);
     assertRule("a > 0.1234", "a", ">", 0.1234);
-    assertRule("a = 0.1234", "a", ">", 0.1234);
+    assertRule("a = 0.1234", "a", "=", 0.1234);
   });
 });
-

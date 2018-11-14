@@ -5,10 +5,10 @@ const assert = require("assert");
 const audit_rule_1 = require("../../src/task/audit-rule");
 describe("AuditRule tests", () => {
     function assertRuleShouldThrow(auditRuleStr) {
-        assert.throws(() => audit_rule_1.default.fromString(auditRuleStr));
+        assert.throws(() => audit_rule_1.AuditRule.fromString(auditRuleStr));
     }
     function assertRule(auditRuleStr, expectedAuditName, expectedOperator, expectedScore) {
-        const rule = audit_rule_1.default.fromString(auditRuleStr);
+        const rule = audit_rule_1.AuditRule.fromString(auditRuleStr);
         assert.equal(rule.auditName, expectedAuditName);
         assert.equal(rule.operator, expectedOperator);
         assert.equal(rule.score, expectedScore);
@@ -18,7 +18,7 @@ describe("AuditRule tests", () => {
         assertRuleShouldThrow("");
         assertRuleShouldThrow(" ");
     });
-    it('Malformed rule should throw', () => {
+    it("Malformed rule should throw", () => {
         assertRuleShouldThrow("a");
         assertRuleShouldThrow(">");
         assertRuleShouldThrow("0");
@@ -26,7 +26,7 @@ describe("AuditRule tests", () => {
         assertRuleShouldThrow("> 0");
         assertRuleShouldThrow(" a > 0 ");
     });
-    it('Valid integer rules', () => {
+    it("Valid integer rules", () => {
         assertRule("a = 0", "a", "=", 0);
         assertRule("a > 0", "a", ">", 0);
     });
@@ -35,6 +35,6 @@ describe("AuditRule tests", () => {
         assertRule("a > 0.5", "a", ">", 0.5);
         assertRule("a > 0.33", "a", ">", 0.33);
         assertRule("a > 0.1234", "a", ">", 0.1234);
-        assertRule("a = 0.1234", "a", ">", 0.1234);
+        assertRule("a = 0.1234", "a", "=", 0.1234);
     });
 });

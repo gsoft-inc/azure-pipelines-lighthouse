@@ -25,7 +25,7 @@
     VSS.register("registeredEnvironmentObject", {
       updateContext: noop,
       isInvisible: function (tabContext) {
-        // Hide Lighthouse tab if there are no Lighthouse task in the release definition
+        // Hide Lighthouse tab if there are no Lighthouse taskLibrary in the release definition
         if (tabContext && tabContext.releaseEnvironment && tabContext.releaseEnvironment.deployPhasesSnapshot) {
           let phases = tabContext.releaseEnvironment.deployPhasesSnapshot;
           let taskIds = [];

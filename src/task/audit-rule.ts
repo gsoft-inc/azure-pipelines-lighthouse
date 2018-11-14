@@ -1,4 +1,4 @@
-export default class AuditRule {
+export class AuditRule {
   private static readonly AUDIT_RULE_REGEX = /^([a-z-]+)\s*([=>])\s*([0-9]+(\.[0-9]+)?)$/i;
 
   public auditName: string;
@@ -10,7 +10,7 @@ export default class AuditRule {
 
   public static fromString(auditRuleStr: string) {
     if (!auditRuleStr) {
-      throw new Error(`Audit rule string is null or empty.`);
+      throw new Error("Audit rule string is null or empty.");
     }
 
     const matches = AuditRule.AUDIT_RULE_REGEX.exec(auditRuleStr);
