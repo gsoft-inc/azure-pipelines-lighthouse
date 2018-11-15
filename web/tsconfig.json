@@ -6,8 +6,5 @@
     "types": [
       "vss-web-extension-sdk"
     ]
-  },
-  "files": [
-    "tab.ts"
-  ]
+  }
 }
