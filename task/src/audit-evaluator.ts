@@ -3,17 +3,20 @@ import * as os from "os";
 import { AuditRule } from "./audit-rule";
 
 export class AuditEvaluator {
-  public static evaluate(report, auditRulesStr: string) {
-    const auditRuleStrArray = auditRulesStr
+  public static evaluate(report: object, auditRulesStr: string): number {
+    const auditRuleStrArray = (auditRulesStr || "")
       .split(/\r?\n/)
       .map((rule) => rule.trim())
       .filter((rule) => rule.length > 0);
 
     const errors = [];
+    let successCount = 0;
 
     for (const auditRuleStr of auditRuleStrArray) {
       try {
-        this.evaluateAuditRuleStr(report, auditRuleStr);
+        if (this.evaluateAuditRuleStr(report || {}, auditRuleStr)) {
+          successCount++;
+        }
       } catch (err) {
         errors.push(err.message);
       }
@@ -22,13 +25,15 @@ export class AuditEvaluator {
     if (errors.length) {
       throw new Error(errors.join(os.EOL));
     }
+
+    return successCount;
   }
 
   private static evaluateAuditRuleStr(report, auditRuleStr) {
     const rule = AuditRule.fromString(auditRuleStr);
     const audit = AuditEvaluator.findAudit(report.audits, rule.auditName);
     if (audit === null) {
-      return;
+      return false;
     }
 
     let displayValue = audit.displayValue || "";
@@ -45,9 +50,11 @@ export class AuditEvaluator {
         throw new Error(`Expected at least ${rule.score} for audit "${rule.auditName}" score but got ${audit.score}${displayValue}`);
       }
     }
+
+    return true;
   }
 
-  private static findAudit(audits: LH.ResultLite.Audit[], name: string) {
+  private static findAudit(audits: object[], name: string) {
     const audit = audits[name];
     if (!audit) {
       throw new Error(`Could not find audit "${name}"`);

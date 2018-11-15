@@ -20,7 +20,7 @@ export class LighthouseTask {
 
   private command: ToolRunner;
 
-  private jsonReport: LH.ResultLite;
+  private jsonReport: object;
 
   public async run() {
     try {
