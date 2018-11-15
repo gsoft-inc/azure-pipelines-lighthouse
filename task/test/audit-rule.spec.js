@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("mocha");
 const assert = require("assert");
-const audit_rule_1 = require("../../src/task/audit-rule");
+const audit_rule_1 = require("../src/audit-rule");
 describe("AuditRule tests", () => {
     function assertRuleShouldThrow(auditRuleStr) {
         assert.throws(() => audit_rule_1.AuditRule.fromString(auditRuleStr));

@@ -5,10 +5,9 @@
   "scripts": {
     "package": "npm run clean && npm run compile && tfx extension create --rev-version",
     "clean": "rimraf ./*.vsix",
-    "compile": "tsc -b src/task src/web test/task",
-    "watch": "tsc -b src/task src/web test/task -w",
+    "compile": "tsc -p task && tsc -p web",
     "postinstall": "npm run install-task-lib && npm run compile",
-    "install-task-lib": "cd src && cd task && npm install"
+    "install-task-lib": "cd task && npm install"
   },
   "dependencies": {
     "vss-web-extension-sdk": "^5.141.0"
@@ -21,6 +20,6 @@
     "tfx-cli": "^0.6.3",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
-    "typescript": "^3.1.6"
+    "typescript": "^2.6.1"
   }
 }

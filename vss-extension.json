@@ -65,27 +65,27 @@
       "addressable": true
     },
     {
-      "path": "src/web/tab.js",
+      "path": "web/src/tab.js",
       "packagePath": "scripts/tab.js",
       "addressable": true
     },
     {
-      "path": "src/web/tab-build.html",
+      "path": "web/src/tab-build.html",
       "packagePath": "tab-build.html",
       "addressable": true
     },
     {
-      "path": "src/web/tab-release.html",
+      "path": "web/src/tab-release.html",
       "packagePath": "tab-release.html",
       "addressable": true
     },
     {
-      "path": "src/task/task.json",
+      "path": "task/src/task.json",
       "packagePath": "Tasks/Lighthouse/task.json",
       "addressable": true
     },
     {
-      "path": "src/task/execute-lighthouse.js",
+      "path": "task/src/execute-lighthouse.js",
       "packagePath": "Tasks/Lighthouse/execute-lighthouse.js",
       "addressable": true
     },
@@ -95,7 +95,7 @@
       "addressable": true
     },
     {
-      "path": "src/task/node_modules",
+      "path": "task/src/node_modules",
       "packagePath": "Tasks/Lighthouse/node_modules",
       "addressable": true
     },

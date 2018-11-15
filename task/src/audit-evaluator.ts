@@ -3,7 +3,7 @@ import * as os from "os";
 import { AuditRule } from "./audit-rule";
 
 export class AuditEvaluator {
-  public static evaluate(report, auditRulesStr) {
+  public static evaluate(report, auditRulesStr: string) {
     const auditRuleStrArray = auditRulesStr
       .split(/\r?\n/)
       .map((rule) => rule.trim())
