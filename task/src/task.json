@@ -47,7 +47,7 @@
       "label": "Enable audit score evaluation",
       "defaultValue": "false",
       "required": true,
-      "helpMarkDown": "Allow you to write audit score rules that will be evaluated. The task will fail if any rule fails."
+      "helpMarkDown": "Allow you to write audit score rules that will be evaluated. The task will fail if any rule fails. "
     },
     {
       "name": "auditRulesStr",
@@ -55,7 +55,7 @@
       "label": "Audit rules",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "TODO",
+      "helpMarkDown": "One rule per line. Rule formatting:\n`my-audit-id = 1` (expect score of my-audit-id to be equal to 1)\n`my-audit-id > 0.5` (expect score of my-audit-id to be greater than 0.5)",
       "visibleRule": "evaluateAuditRules=true"
     },
     {
@@ -64,7 +64,7 @@
       "label": "Working Directory",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Location of your package.json where the lighthouse npm package is installed. Defaults to the root of the repository."
+      "helpMarkDown": "Location of your package.json where the lighthouse npm package is installed. Not necessary if lighthouse is installed globally. Defaults to the root of the repository."
     }
   ],
   "execution": {
