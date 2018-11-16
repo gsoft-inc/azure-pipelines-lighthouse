@@ -5,7 +5,7 @@
   "publisher": "AnthonySimmon",
   "public": false,
   "author": "Anthony Simmon",
-  "version": "0.1.139",
+  "version": "0.1.146",
   "description": "Embed Google Lighthouse HTML results in Azure Pipelines",
   "galleryFlags": [
     "Preview"
@@ -87,6 +87,16 @@
     {
       "path": "task/src/execute-lighthouse.js",
       "packagePath": "Tasks/Lighthouse/execute-lighthouse.js",
+      "addressable": true
+    },
+    {
+      "path": "task/src/audit-evaluator.js",
+      "packagePath": "Tasks/Lighthouse/audit-evaluator.js",
+      "addressable": true
+    },
+    {
+      "path": "task/src/audit-rule.js",
+      "packagePath": "Tasks/Lighthouse/audit-rule.js",
       "addressable": true
     },
     {

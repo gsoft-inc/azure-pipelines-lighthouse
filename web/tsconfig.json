@@ -5,13 +5,6 @@
     "target": "es6",
     "types": [
       "vss-web-extension-sdk"
-    ],
-    "outFile": "src/tab.js"
-  },
-  "files": [
-    "src/base-lighthouse-tab.ts",
-    "src/build-lighthouse-tab.ts",
-    "src/release-lighthouse-tab.ts",
-    "src/tab.ts"
-  ]
+    ]
+  }
 }

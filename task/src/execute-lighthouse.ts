@@ -1,4 +1,3 @@
-
 import * as fs from "fs";
 import * as path from "path";
 
@@ -142,7 +141,7 @@ export class LighthouseTask {
       type: "lighthouse_html_result",
     };
 
-    taskLibrary.command("taskLibrary.addattachment", properties, this.htmlReportPath);
+    taskLibrary.command("task.addattachment", properties, this.htmlReportPath);
   }
 
   private readJsonReport() {
