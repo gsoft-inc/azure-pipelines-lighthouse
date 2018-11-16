@@ -18,6 +18,12 @@ no-vulnerable-libraries = 1
 
 You can also use the `>` (greater than) operator to evaluate audit scores that are decimal between 0 and 1.
 
+## Screenshots
+
+![Lighthouse HTML report embed in a tab](https://raw.githubusercontent.com/sharegate/azure-pipelines-lighthouse/master/docs/lh-result.png?v0)
+
+![Lighthouse task](https://raw.githubusercontent.com/sharegate/azure-pipelines-lighthouse/master/docs/lh-task.png?v0)
+
 ## Installation
 
 Lighthouse for Azure Pipelines is not yet available on the Visual Studio Marketplace.
