@@ -4,11 +4,7 @@
     "target": "es6",
     "types": [
       "azure-pipelines-task-lib",
-      "node",
-      "q"
+      "node"
     ]
-  },
-  "files": [
-    "execute-lighthouse.ts"
-  ]
+  }
 }
