@@ -5,7 +5,7 @@
   "publisher": "AnthonySimmon",
   "public": false,
   "author": "Anthony Simmon",
-  "version": "0.1.148",
+  "version": "1.2.8",
   "description": "Embed Google Lighthouse HTML results in Azure Pipelines",
   "galleryFlags": [
     "Preview"
@@ -31,8 +31,7 @@
     "Visual Studio Extensions"
   ],
   "categories": [
-    "Build and release",
-    "Pipelines"
+    "Azure Pipelines"
   ],
   "screenshots": [{
     "path": "static/images/screenshot-1.png"
