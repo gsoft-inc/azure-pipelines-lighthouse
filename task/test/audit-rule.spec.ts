@@ -11,9 +11,9 @@ describe("AuditRule tests", () => {
   function assertRule(auditRuleStr: string, expectedAuditName: string, expectedOperator: string, expectedScore: number) {
     const rule = AuditRule.fromString(auditRuleStr);
 
-    assert.equal(rule.auditName, expectedAuditName);
-    assert.equal(rule.operator, expectedOperator);
-    assert.equal(rule.score, expectedScore);
+    assert.strictEqual(rule.auditName, expectedAuditName);
+    assert.strictEqual(rule.operator, expectedOperator);
+    assert.strictEqual(rule.score, expectedScore);
   }
 
   it("Null or empty rule should throw", () => {
