@@ -13,13 +13,13 @@
     "vss-web-extension-sdk": "^5.141.0"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^8.0.7",
-    "mocha": "^5.2.0",
-    "rimraf": "^2.6.2",
-    "tfx-cli": "^0.6.3",
-    "ts-node": "^7.0.1",
-    "tslint": "^5.11.0",
-    "typescript": "^2.6.1"
+    "@types/mocha": "^7.0.1",
+    "@types/node": "^10.17.14",
+    "mocha": "^7.0.1",
+    "rimraf": "^3.0.1",
+    "tfx-cli": "^0.7.11",
+    "ts-node": "^8.6.2",
+    "tslint": "^6.0.0",
+    "typescript": "^3.7.5"
   }
 }
