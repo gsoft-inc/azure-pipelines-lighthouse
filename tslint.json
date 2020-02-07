@@ -1,12 +1,11 @@
 {
   "defaultSeverity": "error",
-  "extends": [
-    "tslint:recommended"
-  ],
+  "extends": ["tslint:recommended"],
   "jsRules": {},
   "rules": {
     "max-line-length": [true, 160],
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "no-console": false
   },
   "rulesDirectory": []
 }

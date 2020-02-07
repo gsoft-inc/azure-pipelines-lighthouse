@@ -1,13 +1,13 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from 'fs';
+import * as path from 'path';
 
-import * as taskLibrary from "azure-pipelines-task-lib/task";
-import { ToolRunner } from "azure-pipelines-task-lib/toolrunner";
+import * as taskLibrary from 'azure-pipelines-task-lib/task';
+import { ToolRunner } from 'azure-pipelines-task-lib/toolrunner';
 
-import { AuditEvaluator } from "./audit-evaluator";
+import { AuditEvaluator } from './audit-evaluator';
 
 export class LighthouseTask {
-  private static readonly BASE_REPORT_NAME = "lighthouseresult";
+  private static readonly BASE_REPORT_NAME = 'lighthouseresult';
 
   private targetUrl: string;
   private workingDirectory: string;
@@ -45,23 +45,23 @@ export class LighthouseTask {
   }
 
   private ensureNodeAndNpmToolsAreAvailable() {
-    this.nodeExecPath = taskLibrary.which("node", true);
+    this.nodeExecPath = taskLibrary.which('node', true);
     console.log(`Node.js found at: ${this.nodeExecPath}`);
 
-    this.npmExecPath = taskLibrary.which("npm", true);
+    this.npmExecPath = taskLibrary.which('npm', true);
     console.log(`NPM found at: ${this.npmExecPath}`);
   }
 
   private defineLighthouseTargetUrl() {
-    this.targetUrl = taskLibrary.getInput("url", true);
+    this.targetUrl = taskLibrary.getInput('url', true);
     console.log(`Lighthouse target URL: ${this.targetUrl}`);
   }
 
   private defineWorkingDirectory() {
-    const sourceDirectory = taskLibrary.getVariable("build.sourceDirectory") || taskLibrary.getVariable("build.sourcesDirectory");
-    this.workingDirectory = taskLibrary.getInput("cwd", false) || sourceDirectory;
+    const sourceDirectory = taskLibrary.getVariable('build.sourceDirectory') || taskLibrary.getVariable('build.sourcesDirectory');
+    this.workingDirectory = taskLibrary.getInput('cwd', false) || sourceDirectory;
     if (!this.workingDirectory) {
-      throw new Error("Working directory is not defined");
+      throw new Error('Working directory is not defined');
     }
 
     console.log(`Working directory: ${this.workingDirectory}`);
@@ -76,23 +76,18 @@ export class LighthouseTask {
   }
 
   private defineLighthouseCliArgs() {
-    const argsStr = taskLibrary.getInput("args", false) || "";
+    const argsStr = taskLibrary.getInput('args', false) || '';
 
-    const illegalArgs = [
-      "--view=",
-      "--output=",
-      "--output-path=",
-      "--chrome-flags=",
-    ];
+    const illegalArgs = ['--help', '--version', '--view', '--output=', '--output-path=', '--chrome-flags='];
 
     const args = argsStr
       .split(/\r?\n/)
-      .map((arg) => arg.trim())
-      .filter((arg) => arg.length > 0)
-      .filter((arg) => !illegalArgs.some((illegalArg) => arg.startsWith(illegalArg)));
+      .map(arg => arg.trim())
+      .filter(arg => arg.length > 0)
+      .filter(arg => !illegalArgs.some(illegalArg => arg.startsWith(illegalArg)));
 
-    args.push("--output=html");
-    args.push("--output=json");
+    args.push('--output=html');
+    args.push('--output=json');
     args.push(`--output-path=${path.join(this.workingDirectory, LighthouseTask.BASE_REPORT_NAME)}`);
     args.push('--chrome-flags="--headless"');
 
@@ -122,7 +117,6 @@ export class LighthouseTask {
       return;
     }
 
-    console.log('Existing Lighthouse installation not found');
     execPath = await this.locallyInstallAndGetLighthouseExecPath();
     if (execPath) {
       console.log(`Locally installed Lighthouse found at ${execPath}`);
@@ -135,41 +129,39 @@ export class LighthouseTask {
   }
 
   private defineEvaluateAuditRules() {
-    this.evaluateAuditRules = taskLibrary.getBoolInput("evaluateAuditRules", false);
-    this.auditRulesStr = taskLibrary.getInput("auditRulesStr", false) || "";
+    this.evaluateAuditRules = taskLibrary.getBoolInput('evaluateAuditRules', false);
+    this.auditRulesStr = taskLibrary.getInput('auditRulesStr', false) || '';
   }
 
   private getGloballyInstalledLighthouseExecPath(): string {
-    const execPath = taskLibrary.which("lighthouse", false);
-    return fs.existsSync(execPath) ? execPath : "";
+    const execPath = taskLibrary.which('lighthouse', false);
+    return fs.existsSync(execPath) ? execPath : '';
   }
 
   private getLocallyInstalledLighthouseExecPath(): string {
-    const nodeModulesPath = path.join(this.workingDirectory, "node_modules");
-    const execPath = path.join(nodeModulesPath, "lighthouse", "lighthouse-cli", "index.js");
-    return fs.existsSync(execPath) ? execPath : "";
+    const nodeModulesPath = path.join(this.workingDirectory, 'node_modules');
+    const execPath = path.join(nodeModulesPath, 'lighthouse', 'lighthouse-cli', 'index.js');
+    return fs.existsSync(execPath) ? execPath : '';
   }
 
-  private readonly tempLighthouseNpmLocation = "__lighthouse-tmp";
+  private readonly tempLighthouseNpmLocation = '__lighthouse-tmp';
 
   private async locallyInstallAndGetLighthouseExecPath() {
-    const tempFolderPath = taskLibrary.getVariable("agent.tempDirectory");
+    const tempFolderPath = taskLibrary.getVariable('agent.tempDirectory');
     const npmInstallPrefix = path.join(tempFolderPath || this.workingDirectory, this.tempLighthouseNpmLocation);
-    const execPath = path.join(npmInstallPrefix, "node_modules", "lighthouse", "lighthouse-cli", "index.js");
+    const execPath = path.join(npmInstallPrefix, 'node_modules', 'lighthouse', 'lighthouse-cli', 'index.js');
 
-    if (fs.existsSync(execPath))
-      return execPath;
+    if (fs.existsSync(execPath)) return execPath;
 
+    console.log('Existing Lighthouse installation not found');
     console.log(`Lighthouse will be installed using NPM at: ${npmInstallPrefix}`);
     const npmCommand = taskLibrary.tool(this.npmExecPath);
-    npmCommand.arg([
-      "install", "lighthouse", "--prefix", npmInstallPrefix
-    ]);
+    npmCommand.arg(['install', 'lighthouse', '--prefix', npmInstallPrefix]);
 
     const npmResultCode = await npmCommand.exec();
     console.log(`Installing Lighthouse with NPM returned: ${npmResultCode}`);
 
-    return fs.existsSync(execPath) ? execPath : "";
+    return fs.existsSync(execPath) ? execPath : '';
   }
 
   private async executeLighthouse() {
@@ -189,24 +181,22 @@ export class LighthouseTask {
 
   private addLighthouseHtmlAttachment() {
     const properties = {
-      name: "lighthouseresult",
-      type: "lighthouse_html_result",
+      name: 'lighthouseresult',
+      type: 'lighthouse_html_result'
     };
 
     console.log('Adding the report as attachment of this build / release');
-    taskLibrary.command("task.addattachment", properties, this.htmlReportPath);
+    taskLibrary.command('task.addattachment', properties, this.htmlReportPath);
   }
 
   private readJsonReport() {
-    const jsonStr = fs.readFileSync(this.jsonReportPath, "utf8");
+    const jsonStr = fs.readFileSync(this.jsonReportPath, 'utf8');
     this.jsonReport = JSON.parse(jsonStr);
   }
 
   private processCriticalAudits() {
     if (this.evaluateAuditRules) {
-      AuditEvaluator.evaluate(
-        this.jsonReport, this.auditRulesStr,
-      );
+      AuditEvaluator.evaluate(this.jsonReport, this.auditRulesStr);
     }
   }
 }
