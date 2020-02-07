@@ -9,13 +9,21 @@
     "postinstall": "npm run install-task-lib && npm run compile",
     "install-task-lib": "cd task && npm install"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  },
   "dependencies": {
     "vss-web-extension-sdk": "^5.141.0"
   },
   "devDependencies": {
     "@types/mocha": "^7.0.1",
     "@types/node": "^10.17.14",
+    "husky": "^4.2.1",
     "mocha": "^7.0.1",
+    "prettier": "^1.19.1",
+    "pretty-quick": "^2.0.1",
     "rimraf": "^3.0.1",
     "tfx-cli": "^0.7.11",
     "ts-node": "^8.6.2",
