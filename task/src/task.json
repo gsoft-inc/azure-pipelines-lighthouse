@@ -12,7 +12,7 @@
   "version": {
     "Major": "0",
     "Minor": "1",
-    "Patch": "156"
+    "Patch": "157"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "Lighthouse $(url)",
