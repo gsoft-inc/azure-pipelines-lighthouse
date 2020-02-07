@@ -1,7 +1,7 @@
 export class AuditRule {
   public static fromString(auditRuleStr: string) {
     if (!auditRuleStr) {
-      throw new Error("Audit rule string is null or empty.");
+      throw new Error('Audit rule string is null or empty.');
     }
 
     const matches = AuditRule.AUDIT_RULE_REGEX.exec(auditRuleStr);
@@ -24,6 +24,5 @@ export class AuditRule {
   public operator: string;
   public score: number;
 
-  protected constructor() {
-  }
+  protected constructor() {}
 }
