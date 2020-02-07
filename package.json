@@ -3,11 +3,12 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "package": "npm run clean && npm run compile && tfx extension create --rev-version",
+    "package": "npm run clean && npm run compile && tfx extension create",
     "clean": "rimraf ./*.vsix",
     "compile": "tsc -p task && tsc -p web",
     "postinstall": "npm run install-task-lib && npm run compile",
-    "install-task-lib": "cd task && npm install"
+    "install-task-lib": "cd task && npm install",
+    "test": "mocha task/test/"
   },
   "husky": {
     "hooks": {

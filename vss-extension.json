@@ -5,40 +5,29 @@
   "publisher": "AnthonySimmon",
   "public": false,
   "author": "Anthony Simmon",
-  "version": "0.1.155",
+  "version": "0.1.156",
   "description": "Embed Google Lighthouse HTML results in Azure Pipelines",
-  "galleryFlags": [
-    "Preview"
+  "galleryFlags": ["Preview"],
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
   ],
-  "targets": [{
-    "id": "Microsoft.VisualStudio.Services"
-  }],
-  "scopes": [
-    "vso.build_execute",
-    "vso.release_execute"
-  ],
+  "scopes": ["vso.build_execute", "vso.release_execute"],
   "icons": {
     "default": "static/images/extension-logo.png"
   },
-  "demands": [
-    "api-version/3.0"
+  "demands": ["api-version/3.0"],
+  "tags": ["Lighthouse", "Build", "Release", "Azure Pipelines", "Visual Studio Extensions"],
+  "categories": ["Build and release", "Pipelines"],
+  "screenshots": [
+    {
+      "path": "static/images/screenshot-1.png"
+    },
+    {
+      "path": "static/images/screenshot-2.png"
+    }
   ],
-  "tags": [
-    "Lighthouse",
-    "Build",
-    "Release",
-    "Azure Pipelines",
-    "Visual Studio Extensions"
-  ],
-  "categories": [
-    "Build and release",
-    "Pipelines"
-  ],
-  "screenshots": [{
-    "path": "static/images/screenshot-1.png"
-  }, {
-    "path": "static/images/screenshot-2.png"
-  }],
   "content": {
     "license": {
       "path": "LICENSE"
@@ -134,7 +123,7 @@
       "id": "release-stage-lighthouse-tab",
       "type": "ms.vss-web.tab",
       "description": "Embed Lighthouse HTML result into a release stage tab",
-      "targets": [ "ms.vss-releaseManagement-web.release-environment-editor-tab" ],
+      "targets": ["ms.vss-releaseManagement-web.release-environment-editor-tab"],
       "properties": {
         "name": "Lighthouse",
         "uri": "tab-release.html",
