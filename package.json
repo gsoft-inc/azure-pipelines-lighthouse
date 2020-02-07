@@ -1,9 +1,9 @@
 {
   "name": "lighthouse-vsts",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.159",
   "scripts": {
-    "package": "npm run clean && npm run compile && tfx extension create",
+    "package": "npm run clean && npm run compile && tfx extension create --rev-version",
     "clean": "rimraf ./*.vsix",
     "compile": "tsc -p task && tsc -p web",
     "postinstall": "npm run install-task-lib && npm run compile",

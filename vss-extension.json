@@ -5,7 +5,7 @@
   "publisher": "AnthonySimmon",
   "public": false,
   "author": "Anthony Simmon",
-  "version": "0.1.157",
+  "version": "0.1.159",
   "description": "Embed Google Lighthouse HTML results in Azure Pipelines",
   "galleryFlags": ["Preview"],
   "targets": [
