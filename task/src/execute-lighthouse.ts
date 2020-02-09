@@ -209,7 +209,13 @@ export class LighthouseTask {
   }
 }
 
-new LighthouseTask().run().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+new LighthouseTask().run().then(
+  () => {
+    console.log('Lighthouse task finished');
+    process.exit(0);
+  },
+  err => {
+    console.error(err);
+    process.exit(1);
+  }
+);

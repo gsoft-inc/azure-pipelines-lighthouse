@@ -104,6 +104,7 @@ const run = async args => {
       settings.public = false;
 
       const devVersion = await getPublishedVersion(args.token, settings.publisher, settings.id);
+      console.log('Current development extension version:', JSON.stringify(devVersion, null, 2));
 
       settings.version.major = Math.max(prodVersion.major, devVersion.major);
       settings.version.minor = Math.max(prodVersion.minor, devVersion.minor);
@@ -146,7 +147,13 @@ const args = minimist(process.argv.slice(2), {
   default: { 'release-type': 'dev' }
 });
 
-run(args).catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+run(args).then(
+  () => {
+    console.log('Version bump finished');
+    process.exit(0);
+  },
+  err => {
+    console.error(err);
+    process.exit(1);
+  }
+);
