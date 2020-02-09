@@ -72,7 +72,14 @@ async function updateJsonContent(filePath, update) {
   console.log(`Updated file: ${filePath}`);
 }
 
+const releaseTypes = new Set(['dev', 'hotfix', 'prod']);
+
 const run = async args => {
+  if (!args.token) throw new Error('Argument --token is missing (Azure DevOps PAT token for VS Marketplace)');
+
+  if (!args['release-type'] || !releaseTypes.has(args['release-type']))
+    throw new Error('Argument --release-type is missing (valid values: dev, hotfix, prod)');
+
   console.log(`Updating extension information for ${args['release-type']}`);
 
   const settings = {
