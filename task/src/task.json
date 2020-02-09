@@ -3,7 +3,7 @@
   "name": "Lighthouse",
   "friendlyName": "Lighthouse",
   "description": "Embed Google Lighthouse HTML result in Azure Pipelines",
-  "author": "Anthony Simmon",
+  "author": "GSoft",
   "helpMarkDown": "Embed Google Lighthouse HTML results in Azure Pipelines. You need to provide your own installation of the npm package lighthouse.",
   "category": "Utility",
   "visibility": ["Build", "Release"],
