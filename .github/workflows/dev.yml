@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   build_package:
-    name: 'Build and Package Extension'
+    name: Build and Package Extension
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +34,7 @@ jobs:
           path: PackageOutput
 
   publish_marketplace:
-    name: 'Publish to VS Marketplace'
+    name: Publish to VS Marketplace
     needs: build_package
     runs-on: ubuntu-latest
     steps:
