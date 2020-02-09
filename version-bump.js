@@ -130,6 +130,7 @@ const run = async args => {
     content.name = settings.name;
     content.publisher = settings.publisher;
     content.galleryFlags = settings.galleryFlags;
+    content.public = settings.public;
   });
 
   const taskJsonPath = path.resolve(__dirname, 'task/src/task.json');
