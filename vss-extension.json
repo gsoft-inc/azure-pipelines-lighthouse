@@ -1,13 +1,13 @@
 {
   "manifestVersion": 1,
   "id": "lighthouse-vsts",
+  "version": "1.0.0",
   "name": "Lighthouse",
-  "publisher": "AnthonySimmon",
-  "public": false,
+  "description": "Embed Google Lighthouse HTML result in Azure Pipelines",
+  "publisher": "GSoft",
   "author": "Anthony Simmon",
-  "version": "0.1.159",
-  "description": "Embed Google Lighthouse HTML results in Azure Pipelines",
-  "galleryFlags": ["Preview"],
+  "public": true,
+  "galleryFlags": ["Public"],
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
@@ -19,7 +19,7 @@
   },
   "demands": ["api-version/3.0"],
   "tags": ["Lighthouse", "Build", "Release", "Azure Pipelines", "Visual Studio Extensions"],
-  "categories": ["Build and release", "Pipelines"],
+  "categories": ["Build and release", "Azure Pipelines"],
   "screenshots": [
     {
       "path": "static/images/screenshot-1.png"
@@ -29,6 +29,9 @@
     }
   ],
   "content": {
+    "details": {
+      "path": "README.md"
+    },
     "license": {
       "path": "LICENSE"
     }
@@ -140,5 +143,9 @@
         "name": "Tasks/Lighthouse"
       }
     }
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "uri": "https://github.com/gsoft-inc/azure-pipelines-lighthouse"
+  }
 }

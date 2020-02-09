@@ -1,14 +1,12 @@
 {
   "name": "lighthouse-vsts",
-  "private": true,
-  "version": "0.1.159",
   "scripts": {
-    "package": "npm run clean && npm run compile && tfx extension create --rev-version",
-    "clean": "rimraf ./*.vsix",
-    "compile": "tsc -p task && tsc -p web",
-    "postinstall": "npm run install-task-lib && npm run compile",
-    "install-task-lib": "cd task && npm install",
-    "test": "mocha task/test/"
+    "postinstall": "cd task && npm install",
+    "package": "rimraf *.vsix && tsc -p task && tsc -p web && tfx extension create",
+    "bump-version": "node version-bump.js",
+    "publish": "tfx extension publish --publisher gsoft",
+    "publish:dev": "tfx extension publish --publisher gsoft-dev",
+    "test": "mocha task/test"
   },
   "husky": {
     "hooks": {
@@ -22,6 +20,7 @@
     "@types/mocha": "^7.0.1",
     "@types/node": "^10.17.14",
     "husky": "^4.2.1",
+    "minimist": "^1.2.0",
     "mocha": "^7.0.1",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",

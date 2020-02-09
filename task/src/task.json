@@ -2,7 +2,7 @@
   "id": "b18196d0-d3ed-11e8-ada4-43a6658503da",
   "name": "Lighthouse",
   "friendlyName": "Lighthouse",
-  "description": "Lighthouse",
+  "description": "Embed Google Lighthouse HTML result in Azure Pipelines",
   "author": "Anthony Simmon",
   "helpMarkDown": "Embed Google Lighthouse HTML results in Azure Pipelines. You need to provide your own installation of the npm package lighthouse.",
   "category": "Utility",
@@ -10,11 +10,11 @@
   "runsOn": ["Agent", "DeploymentGroup"],
   "demands": ["node.js"],
   "version": {
-    "Major": "0",
-    "Minor": "1",
-    "Patch": "159"
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 0
   },
-  "minimumAgentVersion": "1.95.0",
+  "minimumAgentVersion": "2.0.0",
   "instanceNameFormat": "Lighthouse $(url)",
   "inputs": [
     {
@@ -31,7 +31,7 @@
       "label": "CLI arguments",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "[CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse. One argument per line."
+      "helpMarkDown": "The [CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse. One argument per line."
     },
     {
       "name": "evaluateAuditRules",
@@ -39,7 +39,7 @@
       "label": "Enable audit score evaluation",
       "defaultValue": "false",
       "required": true,
-      "helpMarkDown": "Allow you to write audit score rules that will be evaluated. The task will fail if any rule fails. "
+      "helpMarkDown": "Allow you to write audit score rules that will be evaluated. The task will fail if any rule fails."
     },
     {
       "name": "auditRulesStr",
@@ -56,7 +56,7 @@
       "label": "Working Directory",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Location of your package.json where the lighthouse npm package is installed. Not necessary if lighthouse is installed globally. Defaults to the root of the repository."
+      "helpMarkDown": "If you already have Lighthouse installed on your agent and want to use it, specify here the directory of the package.json where Lighthouse is referenced."
     }
   ],
   "execution": {
