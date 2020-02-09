@@ -19,7 +19,7 @@
   },
   "demands": ["api-version/3.0"],
   "tags": ["Lighthouse", "Build", "Release", "Azure Pipelines", "Visual Studio Extensions"],
-  "categories": ["Build and release", "Azure Pipelines"],
+  "categories": ["Azure Pipelines"],
   "screenshots": [
     {
       "path": "static/images/screenshot-1.png"
