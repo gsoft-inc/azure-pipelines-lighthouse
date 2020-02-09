@@ -138,4 +138,4 @@ const args = minimist(process.argv.slice(2), {
   default: { 'release-type': 'dev' }
 });
 
-run(args);
+run(args).catch(console.error);
