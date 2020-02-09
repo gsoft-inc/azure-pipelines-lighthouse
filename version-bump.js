@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const process = require('process');
 const { exec } = require('child_process');
 const minimist = require('minimist');
 
@@ -145,4 +146,7 @@ const args = minimist(process.argv.slice(2), {
   default: { 'release-type': 'dev' }
 });
 
-run(args).catch(console.error);
+run(args).catch(err => {
+  console.error(err);
+  process.exit(1);
+});
