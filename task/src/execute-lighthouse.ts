@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as process from 'process';
 
 import * as taskLibrary from 'azure-pipelines-task-lib/task';
 import { ToolRunner } from 'azure-pipelines-task-lib/toolrunner';
@@ -208,4 +209,7 @@ export class LighthouseTask {
   }
 }
 
-new LighthouseTask().run().catch(console.log);
+new LighthouseTask().run().catch(err => {
+  console.error(err);
+  process.exit(1);
+});
