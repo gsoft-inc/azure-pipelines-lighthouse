@@ -53,3 +53,7 @@ jobs:
         with:
           name: Extension-Package
           path: package
+
+      - name: Publish to VS Marketplace
+        run: |
+          find ./package -name '*.vsix' -exec npm run publish:dev -- -t ${{ secrets.marketplace_access_token }} --vsix {} \;
