@@ -1,9 +1,9 @@
-import "mocha";
+import 'mocha';
 
-import assert = require("assert");
-import { AuditRule } from "../src/audit-rule";
+import assert = require('assert');
+import { AuditRule } from '../src/library';
 
-describe("AuditRule tests", () => {
+describe('AuditRule tests', () => {
   function assertRuleShouldThrow(auditRuleStr: string) {
     assert.throws(() => AuditRule.fromString(auditRuleStr));
   }
@@ -16,31 +16,31 @@ describe("AuditRule tests", () => {
     assert.strictEqual(rule.score, expectedScore);
   }
 
-  it("Null or empty rule should throw", () => {
+  it('Null or empty rule should throw', () => {
     assertRuleShouldThrow(null);
-    assertRuleShouldThrow("");
-    assertRuleShouldThrow(" ");
+    assertRuleShouldThrow('');
+    assertRuleShouldThrow(' ');
   });
 
-  it("Malformed rule should throw", () => {
-    assertRuleShouldThrow("a");
-    assertRuleShouldThrow(">");
-    assertRuleShouldThrow("0");
-    assertRuleShouldThrow("a >");
-    assertRuleShouldThrow("> 0");
-    assertRuleShouldThrow(" a > 0 ");
+  it('Malformed rule should throw', () => {
+    assertRuleShouldThrow('a');
+    assertRuleShouldThrow('>');
+    assertRuleShouldThrow('0');
+    assertRuleShouldThrow('a >');
+    assertRuleShouldThrow('> 0');
+    assertRuleShouldThrow(' a > 0 ');
   });
 
-  it("Valid integer rules", () => {
-    assertRule("a = 0", "a", "=", 0);
-    assertRule("a > 0", "a", ">", 0);
+  it('Valid integer rules', () => {
+    assertRule('a = 0', 'a', '=', 0);
+    assertRule('a > 0', 'a', '>', 0);
   });
 
-  it("Valid float rules", () => {
-    assertRule("a = 0.5", "a", "=", 0.5);
-    assertRule("a > 0.5", "a", ">", 0.5);
-    assertRule("a > 0.33", "a", ">", 0.33);
-    assertRule("a > 0.1234", "a", ">", 0.1234);
-    assertRule("a = 0.1234", "a", "=", 0.1234);
+  it('Valid float rules', () => {
+    assertRule('a = 0.5', 'a', '=', 0.5);
+    assertRule('a > 0.5', 'a', '>', 0.5);
+    assertRule('a > 0.33', 'a', '>', 0.33);
+    assertRule('a > 0.1234', 'a', '>', 0.1234);
+    assertRule('a = 0.1234', 'a', '=', 0.1234);
   });
 });

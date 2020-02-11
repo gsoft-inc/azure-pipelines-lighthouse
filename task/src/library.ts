@@ -1,11 +1,139 @@
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
-import * as process from 'process';
 
 import * as taskLibrary from 'azure-pipelines-task-lib/task';
 import { ToolRunner } from 'azure-pipelines-task-lib/toolrunner';
 
-import { AuditEvaluator } from './audit-evaluator';
+export class AuditRule {
+  public static fromString(auditRuleStr: string) {
+    if (!auditRuleStr) {
+      throw new Error('Audit rule string is null or empty.');
+    }
+
+    const matches = AuditRule.AUDIT_RULE_REGEX.exec(auditRuleStr);
+    if (!matches) {
+      throw new Error(`Audit rule "${auditRuleStr}" is malformed.`);
+    }
+
+    const rule = new AuditRule();
+
+    rule.auditName = matches[1];
+    rule.operator = matches[2];
+    rule.score = Number(matches[3]);
+
+    return rule;
+  }
+
+  private static readonly AUDIT_RULE_REGEX = /^([a-z-]+)\s*([=>])\s*([0-9]+(\.[0-9]+)?)$/i;
+
+  public auditName: string;
+  public operator: string;
+  public score: number;
+
+  protected constructor() {}
+}
+
+export class AuditEvaluator {
+  public static evaluate(report: object, auditRulesStr: string): number {
+    const auditRuleStrArray = (auditRulesStr || '')
+      .split(/\r?\n/)
+      .map(rule => rule.trim())
+      .filter(rule => rule.length > 0);
+
+    const errors = [];
+    let successCount = 0;
+
+    for (const auditRuleStr of auditRuleStrArray) {
+      try {
+        if (this.evaluateAuditRuleStr(report || {}, auditRuleStr)) {
+          successCount++;
+        }
+      } catch (err) {
+        errors.push(err.message);
+      }
+    }
+
+    if (errors.length) {
+      throw new Error(errors.join(os.EOL));
+    }
+
+    return successCount;
+  }
+
+  private static evaluateAuditRuleStr(report, auditRuleStr) {
+    const rule = AuditRule.fromString(auditRuleStr);
+    const audit = AuditEvaluator.findAudit(report.audits, rule.auditName);
+    if (audit === null) {
+      return false;
+    }
+
+    let displayValue = audit.displayValue || '';
+    if (displayValue.length > 0) {
+      displayValue = `, details: ${displayValue}`;
+    }
+
+    if (rule.operator === '=') {
+      if (audit.score !== rule.score) {
+        throw new Error(`Expected ${rule.score} for audit "${rule.auditName}" score but got ${audit.score}${displayValue}`);
+      }
+    } else if (rule.operator === '>') {
+      if (audit.score < rule.score) {
+        throw new Error(`Expected at least ${rule.score} for audit "${rule.auditName}" score but got ${audit.score}${displayValue}`);
+      }
+    }
+
+    return true;
+  }
+
+  private static findAudit(audits: object[], name: string) {
+    const audit = audits[name];
+    if (!audit) {
+      throw new Error(`Could not find audit "${name}"`);
+    }
+
+    // Do not evaluate informative or not-applicable audits
+    if (typeof audit.score === 'undefined' || audit.score === null) {
+      return null;
+    }
+
+    return audit;
+  }
+}
+
+export class LighthouseCliArgumentSanitizer {
+  public static sanitize(argsStr: string): string[] {
+    const results = [];
+    const whitespaceRegex = /\s/;
+    const illegalArgs = ['--view', '--output=', '--output-path=', '--chrome-flags='];
+    const newlineSplit = argsStr.split(/\r?\n/).map(arg => arg.trim());
+
+    newlineSplit.reverse();
+
+    for (const argsLine of newlineSplit) {
+      let currentWord = '';
+      for (let i = argsLine.length - 1; i >= 0; i--) {
+        const isCurrentWordComplete = whitespaceRegex.test(argsLine[i]);
+        const isLastChar = i === 0;
+
+        if (!isCurrentWordComplete || isLastChar) {
+          currentWord = argsLine[i] + currentWord;
+          if (!isLastChar) continue;
+        }
+
+        if (currentWord.length > 0 && !illegalArgs.some(illegalArg => currentWord.startsWith(illegalArg))) {
+          results.push(currentWord);
+        }
+
+        currentWord = '';
+      }
+    }
+
+    results.reverse();
+
+    return results;
+  }
+}
 
 export class LighthouseTask {
   private static readonly BASE_REPORT_NAME = 'lighthouseresult';
@@ -89,13 +217,7 @@ export class LighthouseTask {
 
   private defineLighthouseCliArgs() {
     const argsStr = taskLibrary.getInput('args', false) || '';
-    const illegalArgs = ['--help', '--version', '--view', '--output=', '--output-path=', '--chrome-flags='];
-
-    const args = argsStr
-      .split(/\r?\n/)
-      .map(arg => arg.trim())
-      .filter(arg => arg.length > 0)
-      .filter(arg => !illegalArgs.some(illegalArg => arg.startsWith(illegalArg)));
+    const args = LighthouseCliArgumentSanitizer.sanitize(argsStr);
 
     args.push('--output=html');
     args.push('--output=json');
@@ -208,14 +330,3 @@ export class LighthouseTask {
     }
   }
 }
-
-new LighthouseTask().run().then(
-  () => {
-    console.log('Lighthouse task finished');
-    process.exit(0);
-  },
-  err => {
-    console.error(err);
-    process.exit(1);
-  }
-);

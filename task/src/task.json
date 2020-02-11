@@ -61,7 +61,7 @@
   ],
   "execution": {
     "Node": {
-      "target": "execute-lighthouse.js",
+      "target": "task.js",
       "argumentFormat": ""
     }
   }

@@ -77,18 +77,13 @@
       "addressable": true
     },
     {
-      "path": "task/src/execute-lighthouse.js",
-      "packagePath": "Tasks/Lighthouse/execute-lighthouse.js",
+      "path": "task/src/task.js",
+      "packagePath": "Tasks/Lighthouse/task.js",
       "addressable": true
     },
     {
-      "path": "task/src/audit-evaluator.js",
-      "packagePath": "Tasks/Lighthouse/audit-evaluator.js",
-      "addressable": true
-    },
-    {
-      "path": "task/src/audit-rule.js",
-      "packagePath": "Tasks/Lighthouse/audit-rule.js",
+      "path": "task/src/library.js",
+      "packagePath": "Tasks/Lighthouse/library.js",
       "addressable": true
     },
     {

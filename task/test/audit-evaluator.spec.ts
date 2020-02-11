@@ -1,19 +1,19 @@
-import "mocha";
+import 'mocha';
 
-import * as assert from "assert";
-import { AuditEvaluator } from "../src/audit-evaluator";
+import * as assert from 'assert';
+import { AuditEvaluator } from '../src/library';
 
-describe("AuditEvaluator", () => {
+describe('AuditEvaluator', () => {
   function assertInvalidArguments(report: object, auditRulesStr: string) {
     assert.strictEqual(AuditEvaluator.evaluate(report, auditRulesStr), 0);
   }
 
-  it("Should throw when empty report or audit rules", () => {
+  it('Should throw when empty report or audit rules', () => {
     assertInvalidArguments(null, null);
     assertInvalidArguments({}, null);
-    assertInvalidArguments(null, "");
-    assertInvalidArguments({}, "");
+    assertInvalidArguments(null, '');
+    assertInvalidArguments({}, '');
     assertInvalidArguments({ audits: null }, null);
-    assertInvalidArguments({ audits: null }, "");
+    assertInvalidArguments({ audits: null }, '');
   });
 });
