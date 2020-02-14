@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as os from 'os';
+import * as url from 'url';
 import * as path from 'path';
 
 import * as taskLibrary from 'azure-pipelines-task-lib/task';
@@ -135,13 +136,41 @@ export class LighthouseCliArgumentSanitizer {
   }
 }
 
+export class ReportFilenameSanitizer {
+  private static readonly illegalRegex = /[\/\?<>\\:\*\|"]/g;
+  private static readonly controlRegex = /[\x00-\x1f\x80-\x9f]/g;
+  private static readonly reservedRegex = /^\.+$/;
+  private static readonly windowsReservedRegex = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+  private static readonly windowsTrailingRegex = /[\. ]+$/;
+
+  public static makeFilenameFromUrl(urlStr: string) {
+    try {
+      const url = new URL(urlStr);
+      return this.replaceIllegalFileCharacters(url.hostname);
+    } catch (err) {
+      throw new Error('Could not parse target URL ' + err.toString());
+    }
+  }
+
+  private static replaceIllegalFileCharacters(input, replacement = '-') {
+    const sanitized = input
+      .toLowerCase()
+      .replace(this.illegalRegex, replacement)
+      .replace(this.controlRegex, replacement)
+      .replace(this.reservedRegex, replacement)
+      .replace(this.windowsReservedRegex, replacement)
+      .replace(this.windowsTrailingRegex, replacement);
+
+    return sanitized.length > 100 ? sanitized.substring(0, 100) : sanitized;
+  }
+}
 export class LighthouseTask {
-  private static readonly BASE_REPORT_NAME = 'lighthouseresult';
   private static readonly TASK_TEMP_FOLDER = '__lighthouse';
 
   private targetUrl: string;
   private tempDirectory: string;
   private workingDirectory: string;
+  private baseReportName: string;
   private htmlReportPath: string;
   private jsonReportPath: string;
   private cliArgs: string[];
@@ -157,7 +186,7 @@ export class LighthouseTask {
   public async run() {
     try {
       this.ensureNodeAndNpmToolsAreAvailable();
-      this.ensureTemporaryDirectory();
+      this.ensureTemporaryDirectoryExists();
       this.defineLighthouseTargetUrl();
       this.defineWorkingDirectory();
       this.defineOutputReportPaths();
@@ -184,7 +213,7 @@ export class LighthouseTask {
     console.log(`NPM found at: ${this.npmExecPath}`);
   }
 
-  private ensureTemporaryDirectory() {
+  private ensureTemporaryDirectoryExists() {
     const agentTempDirectory = taskLibrary.getVariable('agent.tempDirectory');
     this.tempDirectory = path.join(agentTempDirectory, LighthouseTask.TASK_TEMP_FOLDER);
 
@@ -193,7 +222,11 @@ export class LighthouseTask {
   }
 
   private defineLighthouseTargetUrl() {
-    this.targetUrl = taskLibrary.getInput('url', true);
+    this.targetUrl = taskLibrary.getInput('url', true).trim();
+    if (this.targetUrl.length === 0) {
+      throw new Error('Target URL cannot be empty');
+    }
+
     console.log(`Lighthouse target URL: ${this.targetUrl}`);
   }
 
@@ -204,12 +237,17 @@ export class LighthouseTask {
       throw new Error('Working directory is not defined');
     }
 
+    this.workingDirectory = this.workingDirectory.trim();
     console.log(`Working directory: ${this.workingDirectory}`);
   }
 
   private defineOutputReportPaths() {
-    this.htmlReportPath = path.join(this.tempDirectory, `${LighthouseTask.BASE_REPORT_NAME}.report.html`);
-    this.jsonReportPath = path.join(this.tempDirectory, `${LighthouseTask.BASE_REPORT_NAME}.report.json`);
+    const urlAsFilename = ReportFilenameSanitizer.makeFilenameFromUrl(this.targetUrl);
+    const randomNumber = Math.trunc(Math.random() * (99999 - 10000) + 10000);
+
+    this.baseReportName = `${urlAsFilename}-${randomNumber}`;
+    this.htmlReportPath = path.join(this.tempDirectory, `${this.baseReportName}.report.html`);
+    this.jsonReportPath = path.join(this.tempDirectory, `${this.baseReportName}.report.json`);
 
     console.log(`Lighthouse HTML report will be saved at: ${this.htmlReportPath}`);
     console.log(`Lighthouse JSON report will be saved at: ${this.jsonReportPath}`);
@@ -221,7 +259,7 @@ export class LighthouseTask {
 
     args.push('--output=html');
     args.push('--output=json');
-    args.push(`--output-path=${path.join(this.tempDirectory, LighthouseTask.BASE_REPORT_NAME)}`);
+    args.push(`--output-path=${path.join(this.tempDirectory, this.baseReportName)}`);
     args.push('--chrome-flags="--headless"');
 
     args.unshift(this.targetUrl);
@@ -308,15 +346,14 @@ export class LighthouseTask {
   }
 
   private addLighthouseHtmlAttachment() {
-    const properties = {
-      name: 'lighthouseresult',
-      type: 'lighthouse_html_result'
-    };
+    console.log('Adding the HTML report as attachment of this build / release');
+    taskLibrary.addAttachment('lighthouse_html_result', path.basename(this.htmlReportPath), this.htmlReportPath);
 
-    console.log('Adding the report as attachment of this build / release');
-    taskLibrary.command('task.addattachment', properties, this.htmlReportPath);
-    taskLibrary.command('task.uploadfile', properties, this.htmlReportPath);
-    taskLibrary.command('task.uploadfile', properties, this.jsonReportPath);
+    console.log('Uploading the HTML report so it can be downloaded from all logs');
+    taskLibrary.uploadFile(this.htmlReportPath);
+
+    console.log('Uploading the JSON report so it can be downloaded from all logs');
+    taskLibrary.uploadFile(this.jsonReportPath);
   }
 
   private readJsonReport() {
