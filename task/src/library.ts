@@ -144,12 +144,10 @@ export class ReportFilenameSanitizer {
   private static readonly windowsTrailingRegex = /[\. ]+$/;
 
   public static makeFilenameFromUrl(urlStr: string) {
-    try {
-      const url = new URL(urlStr);
-      return this.replaceIllegalFileCharacters(url.hostname);
-    } catch (err) {
-      throw new Error('Could not parse target URL ' + err.toString());
-    }
+    const urlObj = url.parse(urlStr);
+    if (urlObj && urlObj.hostname) return this.replaceIllegalFileCharacters(urlObj.hostname);
+
+    throw new Error(`Could not parse target URL ${urlStr}`);
   }
 
   private static replaceIllegalFileCharacters(input, replacement = '-') {
@@ -218,7 +216,7 @@ export class LighthouseTask {
     this.tempDirectory = path.join(agentTempDirectory, LighthouseTask.TASK_TEMP_FOLDER);
 
     taskLibrary.mkdirP(this.tempDirectory);
-    console.log(`Temporary directory: ${this.workingDirectory}`);
+    console.log(`Temporary directory: ${this.tempDirectory}`);
   }
 
   private defineLighthouseTargetUrl() {
