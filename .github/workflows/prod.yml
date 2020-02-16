@@ -1,0 +1,61 @@
+name: CI/CD - Production
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build_package:
+    name: Build and Package Extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Update extension information
+        run: npm run bump-version -- --token ${{ secrets.marketplace_access_token }} --release-type prod
+
+      - name: Package extension
+        run: npm run package
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: Extension-Package
+          path: PackageOutput
+
+  publish_marketplace:
+    name: Publish to VS Marketplace
+    needs: build_package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: Extension-Package
+          path: package
+
+      - name: Publish to VS Marketplace
+        run: |
+          find ./package -name '*.vsix' -exec npm run publish -- -t ${{ secrets.marketplace_access_token }} --vsix {} \;
