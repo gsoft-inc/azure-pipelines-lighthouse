@@ -2,40 +2,96 @@ import TFS_Release_Contracts = require('ReleaseManagement/Core/Contracts');
 import RM_Client = require('ReleaseManagement/Core/RestClient');
 import TFS_Build_Contracts = require('TFS/Build/Contracts');
 import TFS_Build_Extension_Contracts = require('TFS/Build/ExtensionContracts');
-import TFS_DistributedTask_Contracts = require('TFS/DistributedTask/Contracts');
 import DT_Client = require('TFS/DistributedTask/TaskRestClient');
 import Controls = require('VSS/Controls');
 
 abstract class BaseLighthouseTab extends Controls.BaseControl {
   protected static readonly HUB_NAME = 'build';
   protected static readonly ATTACHMENT_TYPE = 'lighthouse_html_result';
-  protected static readonly ATTACHMENT_NAME = 'lighthouseresult';
-
-  protected static arrayBufferToString(buffer: ArrayBuffer): string {
-    const enc = new TextDecoder('utf-8');
-    const arr = new Uint8Array(buffer);
-    return enc.decode(arr);
-  }
 
   protected constructor() {
     super();
   }
 
-  protected setFrameHtmlContent(htmlStr: string) {
-    const container = this.getElement().get(0);
-    const frame = container.querySelector('#lighthouse-result') as HTMLIFrameElement;
-    const waiting = container.querySelector('#waiting') as HTMLElement;
+  protected arrayBufferToString(buffer: ArrayBuffer): string {
+    const enc = new TextDecoder('utf-8');
+    const arr = new Uint8Array(buffer);
+    return enc.decode(arr);
+  }
 
-    if (htmlStr && frame && waiting) {
-      frame.srcdoc = htmlStr;
-      waiting.style.display = 'none';
-      frame.style.display = 'block';
+  protected extractHostnameFromReportFilename(filename: string): string {
+    const regex = /(.+)-\d+\.report\.html/g;
+    const groups = regex.exec(filename);
+    return groups && groups.length === 2 ? groups[1] : filename;
+  }
+
+  protected displayReports(reports: ILighthouseReport[]) {
+    this.fixIdenticalReportDisplayNames(reports);
+
+    const container = this.getElement();
+    const buttons = container.find('#tabs');
+    const iframes = container.find('#reports');
+
+    buttons.empty();
+    iframes.empty();
+
+    for (let i = 0; i < reports.length; i++) {
+      const report = reports[i];
+
+      const button = $('<button/>', {
+        text: report.displayName
+      });
+
+      button.attr('onClick', `showReport(this, '${report.internalName}');`);
+
+      const iframe = $('<iframe>', {
+        srcdoc: report.html,
+        id: report.internalName,
+        frameborder: '0',
+        width: '100%',
+        height: '100%',
+        scrolling: 'yes',
+        marginheight: '0',
+        marginwidth: '0'
+      });
+
+      if (i === 0) {
+        button.addClass('active');
+        iframe.addClass('active');
+      }
+
+      buttons.append(button);
+      iframes.append(iframe);
+    }
+
+    this.setOverlayText('');
+  }
+
+  private fixIdenticalReportDisplayNames(reports: ILighthouseReport[]) {
+    const displayNameCounters: Record<string, number> = {};
+
+    for (const report of reports) {
+      if (!displayNameCounters[report.displayName]) displayNameCounters[report.displayName] = 0;
+
+      const count = ++displayNameCounters[report.displayName];
+
+      if (count > 1) {
+        report.displayName = `${report.displayName} (${count})`;
+      }
     }
   }
 
-  protected setWaitingText(htmlStr: string) {
-    const container = this.getElement().get(0);
-    container.querySelector('#waiting p').innerHTML = htmlStr;
+  protected setOverlayText(htmlStr: string) {
+    const overlay = this.getElement().find('#overlay');
+    const overlayText = overlay.find('p');
+
+    if (htmlStr && htmlStr.length > 0) {
+      overlay.show();
+      overlayText.html(htmlStr);
+    } else {
+      overlay.hide();
+      overlayText.html('');
+    }
   }
 }
 
@@ -49,19 +105,19 @@ class BuildLighthouseTab extends BaseLighthouseTab {
 
     const sharedConfig: TFS_Build_Extension_Contracts.IBuildResultsViewExtensionConfig = VSS.getConfiguration();
     sharedConfig.onBuildChanged((build: TFS_Build_Contracts.Build) => {
-      this.trySearchForAttachment(build);
+      this.tryDisplayReports(build).catch(console.error);
     });
   }
 
-  private async trySearchForAttachment(build: TFS_Build_Contracts.Build) {
+  private async tryDisplayReports(build: TFS_Build_Contracts.Build) {
     try {
-      await this.searchForAttachment(build);
+      await this.loadReportsFromAttachments(build);
     } catch (err) {
-      this.setWaitingText(err.message);
+      this.setOverlayText(err.message);
     }
   }
 
-  private async searchForAttachment(build: TFS_Build_Contracts.Build) {
+  private async loadReportsFromAttachments(build: TFS_Build_Contracts.Build): Promise<void> {
     const vsoContext: WebContext = VSS.getWebContext();
     const taskClient: DT_Client.TaskHttpClient = DT_Client.getClient();
 
@@ -74,37 +130,36 @@ class BuildLighthouseTab extends BaseLighthouseTab {
       planId,
       BaseLighthouseTab.ATTACHMENT_TYPE
     );
-    const attachment = this.findLighthouseAttachment(attachments);
 
-    if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
-      const recordId = attachment.recordId;
-      const timelineId = attachment.timelineId;
+    const reports: ILighthouseReport[] = [];
 
-      const attachmentContent = await taskClient.getAttachmentContent(
-        projectId,
-        BaseLighthouseTab.HUB_NAME,
-        planId,
-        timelineId,
-        recordId,
-        BaseLighthouseTab.ATTACHMENT_TYPE,
-        attachment.name
-      );
+    for (const attachment of attachments) {
+      if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
+        const attachmentContent = await taskClient.getAttachmentContent(
+          projectId,
+          BaseLighthouseTab.HUB_NAME,
+          planId,
+          attachment.timelineId,
+          attachment.recordId,
+          BaseLighthouseTab.ATTACHMENT_TYPE,
+          attachment.name
+        );
 
-      const htmlResult = BaseLighthouseTab.arrayBufferToString(attachmentContent);
-      this.setFrameHtmlContent(htmlResult);
-    }
-  }
+        const htmlReport = this.arrayBufferToString(attachmentContent);
 
-  private findLighthouseAttachment(attachments: TFS_DistributedTask_Contracts.TaskAttachment[]) {
-    if (attachments) {
-      for (const attachment of attachments) {
-        if (attachment.name === BaseLighthouseTab.ATTACHMENT_NAME) {
-          return attachment;
-        }
+        reports.push({
+          internalName: attachment.name,
+          displayName: this.extractHostnameFromReportFilename(attachment.name),
+          html: htmlReport
+        });
       }
     }
 
-    return null;
+    if (reports.length === 0) {
+      throw new Error('There is no Lighthouse HTML result attachment');
+    }
+
+    this.displayReports(reports);
   }
 }
 
@@ -117,18 +172,18 @@ class ReleaseLighthouseTab extends BaseLighthouseTab {
     super.initialize();
 
     const env: TFS_Release_Contracts.ReleaseEnvironment = VSS.getConfiguration().releaseEnvironment;
-    this.trySearchForAttachment(env.releaseId, env.id);
+    this.tryDisplayReports(env.releaseId, env.id).catch(console.error);
   }
 
-  private async trySearchForAttachment(releaseId: number, environmentId: number) {
+  private async tryDisplayReports(releaseId: number, environmentId: number) {
     try {
-      await this.searchForAttachment(releaseId, environmentId);
+      await this.loadReportsFromAttachments(releaseId, environmentId);
     } catch (err) {
-      this.setWaitingText(err.message);
+      this.setOverlayText(err.message);
     }
   }
 
-  private async searchForAttachmentAsync(releaseId: number, environmentId: number): Promise<IAttachmentMetadata[]> {
+  private async loadReportsFromAttachments(releaseId: number, environmentId: number): Promise<void> {
     const rmClient = RM_Client.getClient() as RM_Client.ReleaseHttpClient;
     const vsoContext: WebContext = VSS.getWebContext();
 
@@ -150,7 +205,7 @@ class ReleaseLighthouseTab extends BaseLighthouseTab {
       throw new Error('There are no plan IDs');
     }
 
-    const allAttachments = new Array<IAttachmentMetadata>();
+    const reports: ILighthouseReport[] = [];
 
     for (const runPlanId of runPlanIds) {
       const attachments = await rmClient.getTaskAttachments(
@@ -164,63 +219,45 @@ class ReleaseLighthouseTab extends BaseLighthouseTab {
 
       for (const attachment of attachments) {
         if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
-          allAttachments.push({
-            projectId: vsoContext.project.id,
-            releaseId: env.releaseId,
-            environmentId: env.id,
-            attemptId: deployStep.attempt,
-            runPlanId: runPlanId,
-            recordId: attachment.recordId,
-            type: BaseLighthouseTab.ATTACHMENT_TYPE,
-            name: attachment.name
+          const attachmentContent = await rmClient.getTaskAttachmentContent(
+            vsoContext.project.id,
+            env.releaseId,
+            env.id,
+            deployStep.attempt,
+            runPlanId,
+            attachment.recordId,
+            attachment.type,
+            attachment.name
+          );
+
+          const htmlReport = this.arrayBufferToString(attachmentContent);
+
+          reports.push({
+            internalName: attachment.name,
+            displayName: this.extractHostnameFromReportFilename(attachment.name),
+            html: htmlReport
           });
         }
       }
     }
 
-    return allAttachments;
-  }
-
-  private async searchForAttachment(releaseId: number, environmentId: number) {
-    const rmClient = RM_Client.getClient() as RM_Client.ReleaseHttpClient;
-    const attachments = await this.searchForAttachmentAsync(releaseId, environmentId);
-
-    if (attachments.length === 0) {
+    if (reports.length === 0) {
       throw new Error('There is no Lighthouse HTML result attachment');
     }
 
-    const attachment = attachments[0];
-    const attachmentContent = await rmClient.getTaskAttachmentContent(
-      attachment.projectId,
-      attachment.releaseId,
-      attachment.environmentId,
-      attachment.attemptId,
-      attachment.runPlanId,
-      attachment.recordId,
-      attachment.type,
-      attachment.name
-    );
-
-    const htmlResult = BaseLighthouseTab.arrayBufferToString(attachmentContent);
-    this.setFrameHtmlContent(htmlResult);
+    this.displayReports(reports);
   }
 }
 
-const rootContainer = document.getElementById('container');
-
+const bodyEl = $('body');
 if (typeof VSS.getConfiguration().onBuildChanged === 'function') {
-  BuildLighthouseTab.enhance(BuildLighthouseTab, rootContainer, {});
+  BuildLighthouseTab.enhance(BuildLighthouseTab, bodyEl, {});
 } else if (typeof VSS.getConfiguration().releaseEnvironment === 'object') {
-  ReleaseLighthouseTab.enhance(ReleaseLighthouseTab, rootContainer, {});
+  ReleaseLighthouseTab.enhance(ReleaseLighthouseTab, bodyEl, {});
 }
 
-interface IAttachmentMetadata {
-  projectId: string;
-  releaseId: number;
-  environmentId: number;
-  attemptId: number;
-  runPlanId: string;
-  recordId: string;
-  type: string;
-  name: string;
+interface ILighthouseReport {
+  internalName: string;
+  displayName: string;
+  html: string;
 }

@@ -25,22 +25,26 @@ describe('AuditRule tests', () => {
   it('Malformed rule should throw', () => {
     assertRuleShouldThrow('a');
     assertRuleShouldThrow('>');
+    assertRuleShouldThrow('<');
     assertRuleShouldThrow('0');
     assertRuleShouldThrow('a >');
     assertRuleShouldThrow('> 0');
-    assertRuleShouldThrow(' a > 0 ');
+    assertRuleShouldThrow('< 0');
   });
 
   it('Valid integer rules', () => {
     assertRule('a = 0', 'a', '=', 0);
     assertRule('a > 0', 'a', '>', 0);
+    assertRule('a < 0', 'a', '<', 0);
   });
 
   it('Valid float rules', () => {
     assertRule('a = 0.5', 'a', '=', 0.5);
     assertRule('a > 0.5', 'a', '>', 0.5);
+    assertRule('a < 0.5', 'a', '<', 0.5);
     assertRule('a > 0.33', 'a', '>', 0.33);
     assertRule('a > 0.1234', 'a', '>', 0.1234);
+    assertRule('a < 0.1234', 'a', '<', 0.1234);
     assertRule('a = 0.1234', 'a', '=', 0.1234);
   });
 });

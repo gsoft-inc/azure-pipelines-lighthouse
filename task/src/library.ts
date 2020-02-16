@@ -12,7 +12,7 @@ export class AuditRule {
       throw new Error('Audit rule string is null or empty.');
     }
 
-    const matches = AuditRule.AUDIT_RULE_REGEX.exec(auditRuleStr);
+    const matches = AuditRule.AUDIT_RULE_REGEX.exec(auditRuleStr.trim());
     if (!matches) {
       throw new Error(`Audit rule "${auditRuleStr}" is malformed.`);
     }
@@ -26,7 +26,7 @@ export class AuditRule {
     return rule;
   }
 
-  private static readonly AUDIT_RULE_REGEX = /^([a-z-]+)\s*([=>])\s*([0-9]+(\.[0-9]+)?)$/i;
+  private static readonly AUDIT_RULE_REGEX = /^([a-z-]+)\s*([=<>])\s*([0-9]+(\.[0-9]+)?)$/i;
 
   public auditName: string;
   public operator: string;
@@ -80,7 +80,15 @@ export class AuditEvaluator {
       }
     } else if (rule.operator === '>') {
       if (audit.score < rule.score) {
-        throw new Error(`Expected at least ${rule.score} for audit "${rule.auditName}" score but got ${audit.score}${displayValue}`);
+        throw new Error(
+          `Expected audit "${rule.auditName}" to have a score greater than ${rule.score}, but got ${audit.score}${displayValue}`
+        );
+      }
+    } else if (rule.operator === '<') {
+      if (audit.score > rule.score) {
+        throw new Error(
+          `Expected audit "${rule.auditName}" to have a score lower than ${rule.score}, but got ${audit.score}${displayValue}`
+        );
       }
     }
 
@@ -289,7 +297,8 @@ export class LighthouseTask {
     execPath = await this.locallyInstallAndGetLighthouseExecPath();
     if (execPath) {
       console.log(`Locally installed Lighthouse found at ${execPath}`);
-      this.lighthouseCommand = taskLibrary.tool(execPath);
+      args.unshift(execPath);
+      this.lighthouseCommand = taskLibrary.tool(this.nodeExecPath);
       this.lighthouseCommand.arg(args);
       return;
     }
