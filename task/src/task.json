@@ -2,9 +2,9 @@
   "id": "b18196d0-d3ed-11e8-ada4-43a6658503da",
   "name": "Lighthouse",
   "friendlyName": "Lighthouse",
-  "description": "Embed Google Lighthouse HTML result in Azure Pipelines",
+  "description": "Display Google Lighthouse reports and evaluate audit scores with assertions.",
   "author": "GSoft",
-  "helpMarkDown": "Embed Google Lighthouse HTML reports in Azure Pipelines. You can provide the lighthouse NPM package, otherwise it will be installed in a temporary directory.",
+  "helpMarkDown": "You can provide the lighthouse NPM package, otherwise it will be installed in a temporary directory.",
   "category": "Utility",
   "visibility": ["Build", "Release"],
   "runsOn": ["Agent", "DeploymentGroup"],
@@ -36,18 +36,18 @@
     {
       "name": "evaluateAuditRules",
       "type": "boolean",
-      "label": "Enable audit score evaluation",
+      "label": "Enable audit score assertions",
       "defaultValue": "false",
       "required": true,
-      "helpMarkDown": "Allow you to write audit score rules that will be evaluated. The task will fail if any rule fails.\nYou can find the [list of available audits here](https://github.com/gsoft-inc/azure-pipelines-lighthouse#available-audits)"
+      "helpMarkDown": "Allow you to write audit score assertions that will be evaluated. The task will fail if any assertion fails.\nYou can find the [list of available audits here](https://github.com/gsoft-inc/azure-pipelines-lighthouse#available-audits)."
     },
     {
       "name": "auditRulesStr",
       "type": "multiLine",
-      "label": "Audit rules",
+      "label": "Audit score assertions",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "One rule per line. Rule formatting:\n`some-audit-id = 1` (expect score of `some-audit-id` to be equal to 1)\n`my-audit-id > 0.5` (expect score of `some-audit-id` to be greater than 0.5)\n`my-audit-id < 0.5` (expect score of `some-audit-id` to be lower than 0.5)",
+      "helpMarkDown": "One assertion per line. Assertion formatting:\n`some-audit-id = 1` (expect score of `some-audit-id` to be equal to 1)\n`my-audit-id > 0.5` (expect score of `some-audit-id` to be greater than 0.5)\n`my-audit-id < 0.5` (expect score of `some-audit-id` to be lower than 0.5)",
       "visibleRule": "evaluateAuditRules=true"
     },
     {

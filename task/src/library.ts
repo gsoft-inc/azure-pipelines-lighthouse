@@ -6,27 +6,27 @@ import * as path from 'path';
 import * as taskLibrary from 'azure-pipelines-task-lib/task';
 import { ToolRunner } from 'azure-pipelines-task-lib/toolrunner';
 
-export class AuditRule {
-  public static fromString(auditRuleStr: string) {
-    if (!auditRuleStr) {
-      throw new Error('Audit rule string is null or empty.');
+export class AuditAssertion {
+  public static fromString(assertionStr: string) {
+    if (!assertionStr) {
+      throw new Error('Audit assertion is null or empty.');
     }
 
-    const matches = AuditRule.AUDIT_RULE_REGEX.exec(auditRuleStr.trim());
+    const matches = AuditAssertion.AUDIT_ASSERTION_REGEX.exec(assertionStr.trim());
     if (!matches) {
-      throw new Error(`Audit rule "${auditRuleStr}" is malformed.`);
+      throw new Error(`Audit assertion "${assertionStr}" is malformed.`);
     }
 
-    const rule = new AuditRule();
+    const assertion = new AuditAssertion();
 
-    rule.auditName = matches[1];
-    rule.operator = matches[2];
-    rule.score = Number(matches[3]);
+    assertion.auditName = matches[1];
+    assertion.operator = matches[2];
+    assertion.score = Number(matches[3]);
 
-    return rule;
+    return assertion;
   }
 
-  private static readonly AUDIT_RULE_REGEX = /^([a-z-]+)\s*([=<>])\s*([0-9]+(\.[0-9]+)?)$/i;
+  private static readonly AUDIT_ASSERTION_REGEX = /^([a-z-]+)\s*([=<>])\s*([0-9]+(\.[0-9]+)?)$/i;
 
   public auditName: string;
   public operator: string;
@@ -36,18 +36,18 @@ export class AuditRule {
 }
 
 export class AuditEvaluator {
-  public static evaluate(report: object, auditRulesStr: string): number {
-    const auditRuleStrArray = (auditRulesStr || '')
+  public static evaluate(report: object, manyAssertionStr: string): number {
+    const assertionStrArray = (manyAssertionStr || '')
       .split(/\r?\n/)
-      .map(rule => rule.trim())
-      .filter(rule => rule.length > 0);
+      .map(a => a.trim())
+      .filter(a => a.length > 0);
 
     const errors = [];
     let successCount = 0;
 
-    for (const auditRuleStr of auditRuleStrArray) {
+    for (const assertionStr of assertionStrArray) {
       try {
-        if (this.evaluateAuditRuleStr(report || {}, auditRuleStr)) {
+        if (this.evaluateAuditAssertionStr(report || {}, assertionStr)) {
           successCount++;
         }
       } catch (err) {
@@ -62,32 +62,32 @@ export class AuditEvaluator {
     return successCount;
   }
 
-  private static evaluateAuditRuleStr(report, auditRuleStr) {
-    const rule = AuditRule.fromString(auditRuleStr);
-    const audit = AuditEvaluator.findAudit(report.audits, rule.auditName);
+  private static evaluateAuditAssertionStr(report, assertionStr) {
+    const assertion = AuditAssertion.fromString(assertionStr);
+    const audit = AuditEvaluator.findAudit(report.audits, assertion.auditName);
     if (audit === null) {
       return false;
     }
 
     let displayValue = audit.displayValue || '';
     if (displayValue.length > 0) {
-      displayValue = `, details: ${displayValue}`;
+      displayValue = `, friendly display value: ${displayValue}`;
     }
 
-    if (rule.operator === '=') {
-      if (audit.score !== rule.score) {
-        throw new Error(`Expected ${rule.score} for audit "${rule.auditName}" score but got ${audit.score}${displayValue}`);
+    if (assertion.operator === '=') {
+      if (audit.score !== assertion.score) {
+        throw new Error(`Expected ${assertion.score} for audit "${assertion.auditName}" score but got ${audit.score}${displayValue}`);
       }
-    } else if (rule.operator === '>') {
-      if (audit.score < rule.score) {
+    } else if (assertion.operator === '>') {
+      if (audit.score < assertion.score) {
         throw new Error(
-          `Expected audit "${rule.auditName}" to have a score greater than ${rule.score}, but got ${audit.score}${displayValue}`
+          `Expected audit "${assertion.auditName}" to have a score greater than ${assertion.score}, but got ${audit.score}${displayValue}`
         );
       }
-    } else if (rule.operator === '<') {
-      if (audit.score > rule.score) {
+    } else if (assertion.operator === '<') {
+      if (audit.score > assertion.score) {
         throw new Error(
-          `Expected audit "${rule.auditName}" to have a score lower than ${rule.score}, but got ${audit.score}${displayValue}`
+          `Expected audit "${assertion.auditName}" to have a score lower than ${assertion.score}, but got ${audit.score}${displayValue}`
         );
       }
     }
@@ -180,8 +180,8 @@ export class LighthouseTask {
   private htmlReportPath: string;
   private jsonReportPath: string;
   private cliArgs: string[];
-  private evaluateAuditRules: boolean;
-  private auditRulesStr: string;
+  private evaluateAuditAssertions: boolean;
+  private auditAssertionsStr: string;
 
   private nodeExecPath: string;
   private npmExecPath: string;
@@ -197,7 +197,7 @@ export class LighthouseTask {
       this.defineWorkingDirectory();
       this.defineOutputReportPaths();
       this.defineLighthouseCliArgs();
-      this.defineEvaluateAuditRules();
+      this.defineEvaluateAuditAssertions();
       await this.defineLighthouseCommand();
       await this.executeLighthouse();
       this.readJsonReport();
@@ -306,9 +306,9 @@ export class LighthouseTask {
     throw new Error('npm package "lighthouse" is not installed globally or locally');
   }
 
-  private defineEvaluateAuditRules() {
-    this.evaluateAuditRules = taskLibrary.getBoolInput('evaluateAuditRules', false);
-    this.auditRulesStr = taskLibrary.getInput('auditRulesStr', false) || '';
+  private defineEvaluateAuditAssertions() {
+    this.evaluateAuditAssertions = taskLibrary.getBoolInput('evaluateAuditRules', false);
+    this.auditAssertionsStr = taskLibrary.getInput('auditRulesStr', false) || '';
   }
 
   private getLocallyInstalledLighthouseExecPath(): string {
@@ -369,8 +369,8 @@ export class LighthouseTask {
   }
 
   private processCriticalAudits() {
-    if (this.evaluateAuditRules) {
-      AuditEvaluator.evaluate(this.jsonReport, this.auditRulesStr);
+    if (this.evaluateAuditAssertions) {
+      AuditEvaluator.evaluate(this.jsonReport, this.auditAssertionsStr);
     }
   }
 }

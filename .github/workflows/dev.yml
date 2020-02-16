@@ -1,6 +1,9 @@
 name: CI/CD - Development
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build_package:

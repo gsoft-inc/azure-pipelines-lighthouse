@@ -3,7 +3,7 @@
   "id": "lighthouse-vsts",
   "version": "1.0.0",
   "name": "Lighthouse",
-  "description": "Embed Google Lighthouse HTML result in Azure Pipelines",
+  "description": "Display Google Lighthouse reports and evaluate audit scores with assertions.",
   "publisher": "GSoft",
   "author": "Anthony Simmon",
   "public": true,
@@ -106,7 +106,7 @@
     {
       "id": "build-lighthouse-tab",
       "type": "ms.vss-build-web.build-results-tab",
-      "description": "Embed Lighthouse HTML result into a build tab",
+      "description": "Display Google Lighthouse reports and evaluate audit scores with assertions.",
       "targets": ["ms.vss-build-web.build-results-view"],
       "properties": {
         "name": "Lighthouse",
@@ -120,7 +120,7 @@
     {
       "id": "release-stage-lighthouse-tab",
       "type": "ms.vss-web.tab",
-      "description": "Embed Lighthouse HTML result into a release stage tab",
+      "description": "Display Google Lighthouse reports and evaluate audit scores with assertions.",
       "targets": ["ms.vss-releaseManagement-web.release-environment-editor-tab"],
       "properties": {
         "name": "Lighthouse",

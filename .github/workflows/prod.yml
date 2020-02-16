@@ -2,7 +2,7 @@ name: CI/CD - Production
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   build_package:
