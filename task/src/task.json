@@ -31,7 +31,7 @@
       "label": "CLI arguments",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "The [CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse. One argument per line.\n`--view`, `--output`, `--output-path`, `--chrome-flags` are prohibited and will be either removed or replaced."
+      "helpMarkDown": "The [CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse. One argument per line.\n\n`--view`, `--output`, `--output-path`, `--chrome-flags` are prohibited and will be either removed or replaced."
     },
     {
       "name": "evaluateAuditRules",
