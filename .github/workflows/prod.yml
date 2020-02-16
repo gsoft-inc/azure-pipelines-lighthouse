@@ -21,7 +21,7 @@ jobs:
         run: npm ci
 
       - name: Update extension information
-        run: npm run bump-version -- --token ${{ secrets.marketplace_access_token }} --release-type prod
+        run: npm run bump-version -- --token ${{ secrets.marketplace_access_token }} --release-type hotfix
 
       - name: Package extension
         run: npm run package
