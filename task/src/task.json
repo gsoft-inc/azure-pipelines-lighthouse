@@ -47,7 +47,7 @@
       "label": "Working Directory",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "If you already have Lighthouse installed on the agent and want to use it, specify here the location of the `node_modules` folder."
+      "helpMarkDown": "If you already have Lighthouse installed on the agent and want to use it, specify here the path of `node_modules`'s parent directory."
     }
   ],
   "execution": {
