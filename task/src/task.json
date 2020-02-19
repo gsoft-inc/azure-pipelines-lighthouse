@@ -34,21 +34,12 @@
       "helpMarkDown": "The [CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse. One argument per line.\n\n`--view`, `--output`, `--output-path`, `--chrome-flags` are prohibited and will be either removed or replaced."
     },
     {
-      "name": "evaluateAuditRules",
-      "type": "boolean",
-      "label": "Enable audit score assertions",
-      "defaultValue": "false",
-      "required": true,
-      "helpMarkDown": "Allow you to write audit score assertions that will be evaluated. The task will fail if any assertion fails.\nYou can find the [list of available audits here](https://github.com/gsoft-inc/azure-pipelines-lighthouse#available-audits)."
-    },
-    {
-      "name": "auditRulesStr",
+      "name": "assertions",
       "type": "multiLine",
       "label": "Audit score assertions",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "One assertion per line. Assertion formatting:\n`some-audit-id = 1` (expect score of `some-audit-id` to be equal to 1)\n`my-audit-id > 0.5` (expect score of `some-audit-id` to be greater than 0.5)\n`my-audit-id < 0.5` (expect score of `some-audit-id` to be lower than 0.5)",
-      "visibleRule": "evaluateAuditRules=true"
+      "helpMarkDown": "Allows you to write audit score assertions that can stop the pipeline if any assertion fail.\\n\\nWrite one assertion per line. For example:\\n`no-vulnerable-libraries = 1` (expects score of `no-vulnerable-libraries` to be equal to 1)\\n`speed-index > 0.5` (expects score of `speed-index` to be greater than 0.5)\\n\\nAudit score values are always between 0 and 1.\\nYou can find the [list of available audits here](https://github.com/gsoft-inc/azure-pipelines-lighthouse#available-audits)."
     },
     {
       "name": "cwd",

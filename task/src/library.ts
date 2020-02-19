@@ -180,7 +180,6 @@ export class LighthouseTask {
   private htmlReportPath: string;
   private jsonReportPath: string;
   private cliArgs: string[];
-  private evaluateAuditAssertions: boolean;
   private auditAssertionsStr: string;
 
   private nodeExecPath: string;
@@ -197,7 +196,7 @@ export class LighthouseTask {
       this.defineWorkingDirectory();
       this.defineOutputReportPaths();
       this.defineLighthouseCliArgs();
-      this.defineEvaluateAuditAssertions();
+      this.defineAuditAssertions();
       await this.defineLighthouseCommand();
       await this.executeLighthouse();
       this.readJsonReport();
@@ -306,9 +305,8 @@ export class LighthouseTask {
     throw new Error('npm package "lighthouse" is not installed globally or locally');
   }
 
-  private defineEvaluateAuditAssertions() {
-    this.evaluateAuditAssertions = taskLibrary.getBoolInput('evaluateAuditRules', false);
-    this.auditAssertionsStr = taskLibrary.getInput('auditRulesStr', false) || '';
+  private defineAuditAssertions() {
+    this.auditAssertionsStr = taskLibrary.getInput('assertions', false) || '';
   }
 
   private getLocallyInstalledLighthouseExecPath(): string {
@@ -369,8 +367,6 @@ export class LighthouseTask {
   }
 
   private processCriticalAudits() {
-    if (this.evaluateAuditAssertions) {
-      AuditEvaluator.evaluate(this.jsonReport, this.auditAssertionsStr);
-    }
+    AuditEvaluator.evaluate(this.jsonReport, this.auditAssertionsStr);
   }
 }
