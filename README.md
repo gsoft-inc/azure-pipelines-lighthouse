@@ -28,7 +28,7 @@ Audit score assertions must be written on separate lines.
 
 ## Installation
 
-Lighthouse for Azure Pipelines is not yet available on the Visual Studio Marketplace.
+Lighthouse for Azure Pipelines can be installed from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=GSoft.lighthouse-vsts).
 
 ## Available audits
 
