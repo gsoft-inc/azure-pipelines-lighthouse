@@ -281,7 +281,7 @@ export class LighthouseTask {
       console.log(`Locally installed Lighthouse found at ${execPath}`);
       args.unshift(execPath);
       this.lighthouseCommand = taskLibrary.tool(this.nodeExecPath);
-      this.lighthouseCommand.arg(args.join(' '));
+      this.lighthouseCommand.line(args.join(' '));
       return;
     }
 
@@ -289,7 +289,7 @@ export class LighthouseTask {
     if (execPath) {
       console.log(`Globally installed Lighthouse found at ${execPath}`);
       this.lighthouseCommand = taskLibrary.tool(execPath);
-      this.lighthouseCommand.arg(args.join(' '));
+      this.lighthouseCommand.line(args.join(' '));
       return;
     }
 
@@ -298,7 +298,7 @@ export class LighthouseTask {
       console.log(`Locally installed Lighthouse found at ${execPath}`);
       args.unshift(execPath);
       this.lighthouseCommand = taskLibrary.tool(this.nodeExecPath);
-      this.lighthouseCommand.arg(args.join(' '));
+      this.lighthouseCommand.line(args.join(' '));
       return;
     }
 
