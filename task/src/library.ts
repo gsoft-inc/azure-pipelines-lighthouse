@@ -261,8 +261,6 @@ export class LighthouseTask {
       }
       this.tabName = parsedTargetUrl.hostname;
     }
-
-    console.log(`This report will be available under the tab name: ${this.tabName}`);
   }
 
   private defineOutputReportPaths() {
