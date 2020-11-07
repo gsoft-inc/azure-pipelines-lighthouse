@@ -55,8 +55,7 @@
       "label": "Report tab name override",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Overrides the default tab name based on the website URL in the HTML report.",
-      "groupName": "advanced"
+      "helpMarkDown": "Overrides the default tab name based on the website URL in the HTML report."
     }
   ],
   "execution": {
