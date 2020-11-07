@@ -276,7 +276,6 @@ export class LighthouseTask {
 
     console.log(`Lighthouse HTML report will be saved at: ${this.htmlReportPath}`);
     console.log(`Lighthouse JSON report will be saved at: ${this.jsonReportPath}`);
-    console.log(`Lighthouse task meta result will be saved at: ${this.jsonMetaPath}`);
   }
 
   private defineLighthouseCliArgs() {
@@ -384,7 +383,6 @@ export class LighthouseTask {
     fs.writeFileSync(this.jsonMetaPath, JSON.stringify(metaContents));
 
     console.log('Adding the JSON meta result as attachment of this build / release');
-    console.log(metaContents);
     taskLibrary.addAttachment('lighthouse_meta_result', metaFileName, this.jsonMetaPath);
 
     console.log('Adding the HTML report as attachment of this build / release');
