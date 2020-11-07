@@ -55,7 +55,7 @@
       "label": "Report tab name override",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Overrides the default tab name based on the website URL in the HTML report."
+      "helpMarkDown": "Overrides the default tab name that will be shown in the HTML Lighthouse result."
     }
   ],
   "execution": {

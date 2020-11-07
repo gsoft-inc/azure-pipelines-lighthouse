@@ -7,7 +7,8 @@ import Controls = require('VSS/Controls');
 
 abstract class BaseLighthouseTab extends Controls.BaseControl {
   protected static readonly HUB_NAME = 'build';
-  protected static readonly ATTACHMENT_TYPE = 'lighthouse_html_result';
+  protected static readonly HTML_ATTACHMENT_TYPE = 'lighthouse_html_result';
+  protected static readonly META_ATTACHMENT_TYPE = 'lighthouse_meta_result';
 
   protected constructor() {
     super();
@@ -71,10 +72,11 @@ abstract class BaseLighthouseTab extends Controls.BaseControl {
     const displayNameCounters: Record<string, number> = {};
 
     for (const report of reports) {
-      if (!displayNameCounters[report.displayName]) displayNameCounters[report.displayName] = 0;
+      if (!displayNameCounters[report.displayName]) {
+        displayNameCounters[report.displayName] = 0;
+      }
 
       const count = ++displayNameCounters[report.displayName];
-
       if (count > 1) {
         report.displayName = `${report.displayName} (${count})`;
       }
@@ -128,7 +130,7 @@ class BuildLighthouseTab extends BaseLighthouseTab {
       projectId,
       BaseLighthouseTab.HUB_NAME,
       planId,
-      BaseLighthouseTab.ATTACHMENT_TYPE
+      BaseLighthouseTab.HTML_ATTACHMENT_TYPE
     );
 
     const reports: ILighthouseReport[] = [];
@@ -141,7 +143,7 @@ class BuildLighthouseTab extends BaseLighthouseTab {
           planId,
           attachment.timelineId,
           attachment.recordId,
-          BaseLighthouseTab.ATTACHMENT_TYPE,
+          BaseLighthouseTab.HTML_ATTACHMENT_TYPE,
           attachment.name
         );
 
@@ -206,18 +208,46 @@ class ReleaseLighthouseTab extends BaseLighthouseTab {
     }
 
     const reports: ILighthouseReport[] = [];
+    const reportTabNames: { [htmlReportName: string]: string } = {};
 
     for (const runPlanId of runPlanIds) {
-      const attachments = await rmClient.getTaskAttachments(
+      const metaAttachments = await rmClient.getTaskAttachments(
         vsoContext.project.id,
         env.releaseId,
         env.id,
         deployStep.attempt,
         runPlanId,
-        BaseLighthouseTab.ATTACHMENT_TYPE
+        BaseLighthouseTab.META_ATTACHMENT_TYPE
       );
 
-      for (const attachment of attachments) {
+      for (const attachment of metaAttachments) {
+        if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
+          const attachmentContent = await rmClient.getTaskAttachmentContent(
+            vsoContext.project.id,
+            env.releaseId,
+            env.id,
+            deployStep.attempt,
+            runPlanId,
+            attachment.recordId,
+            attachment.type,
+            attachment.name
+          );
+
+          const meta = JSON.parse(this.arrayBufferToString(attachmentContent)) as ILighthouseReportMeta;
+          reportTabNames[meta.reportFileName] = meta.tabName;
+        }
+      }
+
+      const htmlAttachments = await rmClient.getTaskAttachments(
+        vsoContext.project.id,
+        env.releaseId,
+        env.id,
+        deployStep.attempt,
+        runPlanId,
+        BaseLighthouseTab.HTML_ATTACHMENT_TYPE
+      );
+
+      for (const attachment of htmlAttachments) {
         if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
           const attachmentContent = await rmClient.getTaskAttachmentContent(
             vsoContext.project.id,
@@ -231,10 +261,11 @@ class ReleaseLighthouseTab extends BaseLighthouseTab {
           );
 
           const htmlReport = this.arrayBufferToString(attachmentContent);
+          const tabName = reportTabNames[attachment.name] || this.extractHostnameFromReportFilename(attachment.name);
 
           reports.push({
             internalName: attachment.name,
-            displayName: this.extractHostnameFromReportFilename(attachment.name),
+            displayName: tabName,
             html: htmlReport
           });
         }
@@ -260,4 +291,10 @@ interface ILighthouseReport {
   internalName: string;
   displayName: string;
   html: string;
+}
+
+interface ILighthouseReportMeta {
+  tabName: string;
+  reportFileName: string;
+  metaFileName: string;
 }
