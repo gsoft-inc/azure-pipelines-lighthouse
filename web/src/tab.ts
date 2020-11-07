@@ -126,7 +126,33 @@ class BuildLighthouseTab extends BaseLighthouseTab {
     const projectId = vsoContext.project.id;
     const planId = build.orchestrationPlan.planId;
 
-    const attachments = await taskClient.getPlanAttachments(
+    const metaAttachments = await taskClient.getPlanAttachments(
+      projectId,
+      BaseLighthouseTab.HUB_NAME,
+      planId,
+      BaseLighthouseTab.META_ATTACHMENT_TYPE
+    );
+
+    const reportTabNames: { [htmlReportName: string]: string } = {};
+
+    for (const attachment of metaAttachments) {
+      if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
+        const attachmentContent = await taskClient.getAttachmentContent(
+          projectId,
+          BaseLighthouseTab.HUB_NAME,
+          planId,
+          attachment.timelineId,
+          attachment.recordId,
+          attachment.type,
+          attachment.name
+        );
+
+        const meta = JSON.parse(this.arrayBufferToString(attachmentContent));
+        reportTabNames[meta.reportFileName] = meta.tabName;
+      }
+    }
+
+    const htmlAttachments = await taskClient.getPlanAttachments(
       projectId,
       BaseLighthouseTab.HUB_NAME,
       planId,
@@ -135,7 +161,7 @@ class BuildLighthouseTab extends BaseLighthouseTab {
 
     const reports: ILighthouseReport[] = [];
 
-    for (const attachment of attachments) {
+    for (const attachment of htmlAttachments) {
       if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
         const attachmentContent = await taskClient.getAttachmentContent(
           projectId,
@@ -143,15 +169,16 @@ class BuildLighthouseTab extends BaseLighthouseTab {
           planId,
           attachment.timelineId,
           attachment.recordId,
-          BaseLighthouseTab.HTML_ATTACHMENT_TYPE,
+          attachment.type,
           attachment.name
         );
 
         const htmlReport = this.arrayBufferToString(attachmentContent);
+        const tabName = reportTabNames[attachment.name] || this.extractHostnameFromReportFilename(attachment.name);
 
         reports.push({
           internalName: attachment.name,
-          displayName: this.extractHostnameFromReportFilename(attachment.name),
+          displayName: tabName,
           html: htmlReport
         });
       }
