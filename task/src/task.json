@@ -48,6 +48,15 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "If you already have Lighthouse installed on the agent and want to use it, specify here the path of `node_modules`'s parent directory."
+    },
+    {
+      "name": "tabName",
+      "type": "string",
+      "label": "Report tab name override",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Overrides the default tab name based on the website URL in the HTML report.",
+      "groupName": "advanced"
     }
   ],
   "execution": {

@@ -350,6 +350,16 @@ export class LighthouseTask {
     console.log(`Lighthouse returned code: ${retCode}`);
   }
 
+  private lettersAndDigits = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+  private randomText(length: number): string {
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += this.lettersAndDigits[Math.floor(Math.random() * this.lettersAndDigits.length)];
+    }
+    return result;
+  }
+
   private addLighthouseHtmlAttachment() {
     console.log('Adding the HTML report as attachment of this build / release');
     taskLibrary.addAttachment('lighthouse_html_result', path.basename(this.htmlReportPath), this.htmlReportPath);
@@ -359,6 +369,9 @@ export class LighthouseTask {
 
     console.log('Uploading the JSON report so it can be downloaded from all logs');
     taskLibrary.uploadFile(this.jsonReportPath);
+
+    taskLibrary.setVariable('var_' + this.randomText(4), 'foobar');
+    taskLibrary.setTaskVariable('var_task_' + this.randomText(4), 'foobar');
   }
 
   private readJsonReport() {
