@@ -7,7 +7,8 @@ import Controls = require('VSS/Controls');
 
 abstract class BaseLighthouseTab extends Controls.BaseControl {
   protected static readonly HUB_NAME = 'build';
-  protected static readonly ATTACHMENT_TYPE = 'lighthouse_html_result';
+  protected static readonly HTML_ATTACHMENT_TYPE = 'lighthouse_html_result';
+  protected static readonly META_ATTACHMENT_TYPE = 'lighthouse_meta_result';
 
   protected constructor() {
     super();
@@ -71,10 +72,11 @@ abstract class BaseLighthouseTab extends Controls.BaseControl {
     const displayNameCounters: Record<string, number> = {};
 
     for (const report of reports) {
-      if (!displayNameCounters[report.displayName]) displayNameCounters[report.displayName] = 0;
+      if (!displayNameCounters[report.displayName]) {
+        displayNameCounters[report.displayName] = 0;
+      }
 
       const count = ++displayNameCounters[report.displayName];
-
       if (count > 1) {
         report.displayName = `${report.displayName} (${count})`;
       }
@@ -124,16 +126,16 @@ class BuildLighthouseTab extends BaseLighthouseTab {
     const projectId = vsoContext.project.id;
     const planId = build.orchestrationPlan.planId;
 
-    const attachments = await taskClient.getPlanAttachments(
+    const metaAttachments = await taskClient.getPlanAttachments(
       projectId,
       BaseLighthouseTab.HUB_NAME,
       planId,
-      BaseLighthouseTab.ATTACHMENT_TYPE
+      BaseLighthouseTab.META_ATTACHMENT_TYPE
     );
 
-    const reports: ILighthouseReport[] = [];
+    const reportTabNames: { [htmlReportName: string]: string } = {};
 
-    for (const attachment of attachments) {
+    for (const attachment of metaAttachments) {
       if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
         const attachmentContent = await taskClient.getAttachmentContent(
           projectId,
@@ -141,15 +143,42 @@ class BuildLighthouseTab extends BaseLighthouseTab {
           planId,
           attachment.timelineId,
           attachment.recordId,
-          BaseLighthouseTab.ATTACHMENT_TYPE,
+          attachment.type,
+          attachment.name
+        );
+
+        const meta = JSON.parse(this.arrayBufferToString(attachmentContent));
+        reportTabNames[meta.reportFileName] = meta.tabName;
+      }
+    }
+
+    const htmlAttachments = await taskClient.getPlanAttachments(
+      projectId,
+      BaseLighthouseTab.HUB_NAME,
+      planId,
+      BaseLighthouseTab.HTML_ATTACHMENT_TYPE
+    );
+
+    const reports: ILighthouseReport[] = [];
+
+    for (const attachment of htmlAttachments) {
+      if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
+        const attachmentContent = await taskClient.getAttachmentContent(
+          projectId,
+          BaseLighthouseTab.HUB_NAME,
+          planId,
+          attachment.timelineId,
+          attachment.recordId,
+          attachment.type,
           attachment.name
         );
 
         const htmlReport = this.arrayBufferToString(attachmentContent);
+        const tabName = reportTabNames[attachment.name] || this.extractHostnameFromReportFilename(attachment.name);
 
         reports.push({
           internalName: attachment.name,
-          displayName: this.extractHostnameFromReportFilename(attachment.name),
+          displayName: tabName,
           html: htmlReport
         });
       }
@@ -206,18 +235,46 @@ class ReleaseLighthouseTab extends BaseLighthouseTab {
     }
 
     const reports: ILighthouseReport[] = [];
+    const reportTabNames: { [htmlReportName: string]: string } = {};
 
     for (const runPlanId of runPlanIds) {
-      const attachments = await rmClient.getTaskAttachments(
+      const metaAttachments = await rmClient.getTaskAttachments(
         vsoContext.project.id,
         env.releaseId,
         env.id,
         deployStep.attempt,
         runPlanId,
-        BaseLighthouseTab.ATTACHMENT_TYPE
+        BaseLighthouseTab.META_ATTACHMENT_TYPE
       );
 
-      for (const attachment of attachments) {
+      for (const attachment of metaAttachments) {
+        if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
+          const attachmentContent = await rmClient.getTaskAttachmentContent(
+            vsoContext.project.id,
+            env.releaseId,
+            env.id,
+            deployStep.attempt,
+            runPlanId,
+            attachment.recordId,
+            attachment.type,
+            attachment.name
+          );
+
+          const meta = JSON.parse(this.arrayBufferToString(attachmentContent)) as ILighthouseReportMeta;
+          reportTabNames[meta.reportFileName] = meta.tabName;
+        }
+      }
+
+      const htmlAttachments = await rmClient.getTaskAttachments(
+        vsoContext.project.id,
+        env.releaseId,
+        env.id,
+        deployStep.attempt,
+        runPlanId,
+        BaseLighthouseTab.HTML_ATTACHMENT_TYPE
+      );
+
+      for (const attachment of htmlAttachments) {
         if (attachment && attachment._links && attachment._links.self && attachment._links.self.href) {
           const attachmentContent = await rmClient.getTaskAttachmentContent(
             vsoContext.project.id,
@@ -231,10 +288,11 @@ class ReleaseLighthouseTab extends BaseLighthouseTab {
           );
 
           const htmlReport = this.arrayBufferToString(attachmentContent);
+          const tabName = reportTabNames[attachment.name] || this.extractHostnameFromReportFilename(attachment.name);
 
           reports.push({
             internalName: attachment.name,
-            displayName: this.extractHostnameFromReportFilename(attachment.name),
+            displayName: tabName,
             html: htmlReport
           });
         }
@@ -260,4 +318,10 @@ interface ILighthouseReport {
   internalName: string;
   displayName: string;
   html: string;
+}
+
+interface ILighthouseReportMeta {
+  tabName: string;
+  reportFileName: string;
+  metaFileName: string;
 }

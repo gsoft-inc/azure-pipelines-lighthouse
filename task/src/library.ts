@@ -170,15 +170,18 @@ export class ReportFilenameSanitizer {
     return sanitized.length > 100 ? sanitized.substring(0, 100) : sanitized;
   }
 }
+
 export class LighthouseTask {
   private static readonly TASK_TEMP_FOLDER = '__lighthouse';
 
   private targetUrl: string;
   private tempDirectory: string;
   private workingDirectory: string;
+  private tabName: string;
   private baseReportName: string;
   private htmlReportPath: string;
   private jsonReportPath: string;
+  private jsonMetaPath: string;
   private cliArgs: string[];
   private auditAssertionsStr: string;
 
@@ -194,6 +197,7 @@ export class LighthouseTask {
       this.ensureTemporaryDirectoryExists();
       this.defineLighthouseTargetUrl();
       this.defineWorkingDirectory();
+      this.defineTabName();
       this.defineOutputReportPaths();
       this.defineLighthouseCliArgs();
       this.defineAuditAssertions();
@@ -246,6 +250,19 @@ export class LighthouseTask {
     console.log(`Working directory: ${this.workingDirectory}`);
   }
 
+  private defineTabName() {
+    const userDefinedTabName = (taskLibrary.getInput('tabName', false) || '').trim();
+    if (userDefinedTabName.length > 0) {
+      this.tabName = userDefinedTabName;
+    } else {
+      const parsedTargetUrl = url.parse(this.targetUrl);
+      if (!parsedTargetUrl || !parsedTargetUrl.hostname) {
+        throw new Error(`Could not parse target URL ${this.targetUrl} to extract tab name`);
+      }
+      this.tabName = parsedTargetUrl.hostname;
+    }
+  }
+
   private defineOutputReportPaths() {
     const urlAsFilename = ReportFilenameSanitizer.makeFilenameFromUrl(this.targetUrl);
     const randomNumber = Math.trunc(Math.random() * (99999 - 10000) + 10000);
@@ -253,6 +270,7 @@ export class LighthouseTask {
     this.baseReportName = `${urlAsFilename}-${randomNumber}`;
     this.htmlReportPath = path.join(this.tempDirectory, `${this.baseReportName}.report.html`);
     this.jsonReportPath = path.join(this.tempDirectory, `${this.baseReportName}.report.json`);
+    this.jsonMetaPath = path.join(this.tempDirectory, `${this.baseReportName}.meta.json`);
 
     console.log(`Lighthouse HTML report will be saved at: ${this.htmlReportPath}`);
     console.log(`Lighthouse JSON report will be saved at: ${this.jsonReportPath}`);
@@ -351,8 +369,22 @@ export class LighthouseTask {
   }
 
   private addLighthouseHtmlAttachment() {
+    const reportFileName = path.basename(this.htmlReportPath);
+    const metaFileName = path.basename(this.jsonMetaPath);
+
+    const metaContents = {
+      tabName: this.tabName,
+      reportFileName: reportFileName,
+      metaFileName: metaFileName
+    };
+
+    fs.writeFileSync(this.jsonMetaPath, JSON.stringify(metaContents));
+
+    console.log('Adding the JSON meta result as attachment of this build / release');
+    taskLibrary.addAttachment('lighthouse_meta_result', metaFileName, this.jsonMetaPath);
+
     console.log('Adding the HTML report as attachment of this build / release');
-    taskLibrary.addAttachment('lighthouse_html_result', path.basename(this.htmlReportPath), this.htmlReportPath);
+    taskLibrary.addAttachment('lighthouse_html_result', reportFileName, this.htmlReportPath);
 
     console.log('Uploading the HTML report so it can be downloaded from all logs');
     taskLibrary.uploadFile(this.htmlReportPath);

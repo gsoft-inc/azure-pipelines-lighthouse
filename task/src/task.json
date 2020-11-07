@@ -42,6 +42,14 @@
       "helpMarkDown": "Allows you to write audit score assertions that can stop the pipeline if any assertion fail.\n\nWrite one assertion per line. For example:\n`no-vulnerable-libraries = 1` (expects score of `no-vulnerable-libraries` to be equal to 1)\n`speed-index > 0.5` (expects score of `speed-index` to be greater than 0.5)\n\nAudit score values are always between 0 and 1.\nYou can find the [list of available audits here](https://github.com/gsoft-inc/azure-pipelines-lighthouse#available-audits)."
     },
     {
+      "name": "tabName",
+      "type": "string",
+      "label": "Report tab name override",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Overrides the default tab name that will be shown in the HTML Lighthouse result."
+    },
+    {
       "name": "cwd",
       "type": "filePath",
       "label": "Working Directory",
