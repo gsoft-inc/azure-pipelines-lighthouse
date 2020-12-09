@@ -229,7 +229,7 @@ class ReleaseLighthouseTab extends BaseLighthouseTab {
       throw new Error('This release has no job');
     }
 
-    const runPlanIds = deployStep.releaseDeployPhases.map(phase => phase.runPlanId);
+    const runPlanIds = deployStep.releaseDeployPhases.map(phase => phase.runPlanId).filter(Boolean);
     if (!runPlanIds.length) {
       throw new Error('There are no plan IDs');
     }
