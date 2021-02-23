@@ -32,7 +32,7 @@ export class AuditAssertion {
   public operator: string;
   public score: number;
 
-  protected constructor() {}
+  protected constructor() { }
 }
 
 export class AuditEvaluator {
@@ -111,10 +111,12 @@ export class AuditEvaluator {
 }
 
 export class LighthouseCliArgumentSanitizer {
+  private static readonly DEFAULT_CHROME_FLAGS: string[] = ["--headless"];
+  private static readonly ILLEGAL_ARGS: string[] = ['--view', '--output=', '--output-path=', '--chrome-flags='];
+
   public static sanitize(argsStr: string): string[] {
     const results = [];
     const whitespaceRegex = /\s/;
-    const illegalArgs = ['--view', '--output=', '--output-path=', '--chrome-flags='];
     const newlineSplit = argsStr.split(/\r?\n/).map(arg => arg.trim());
 
     newlineSplit.reverse();
@@ -130,7 +132,7 @@ export class LighthouseCliArgumentSanitizer {
           if (!isLastChar) continue;
         }
 
-        if (currentWord.length > 0 && !illegalArgs.some(illegalArg => currentWord.startsWith(illegalArg))) {
+        if (currentWord.length > 0 && !this.ILLEGAL_ARGS.some(illegalArg => currentWord.startsWith(illegalArg))) {
           results.push(currentWord);
         }
 
@@ -141,6 +143,25 @@ export class LighthouseCliArgumentSanitizer {
     results.reverse();
 
     return results;
+  }
+
+  public static sanitizeFlags(argsStr: string): string[] {
+    const results: string[] = [];
+    const parameterRegex = /^-{2}([a-zA-z0-9]+-?)*$/;
+    const spaceSplit = argsStr.split(/\s/).map(arg => arg.trim());
+
+    for (const parameter of spaceSplit) {
+      const isWellFormed = parameterRegex.test(parameter) && !this.DEFAULT_CHROME_FLAGS.some(illegalFlag => parameter.startsWith(illegalFlag)) && parameter.length > 0;
+      if (isWellFormed) {
+        results.push(parameter);
+      }
+    }
+
+    this.DEFAULT_CHROME_FLAGS.forEach(defaultFlag => {
+      results.push(defaultFlag);
+    });
+
+    return results.reverse();
   }
 }
 
@@ -173,7 +194,6 @@ export class ReportFilenameSanitizer {
 
 export class LighthouseTask {
   private static readonly TASK_TEMP_FOLDER = '__lighthouse';
-
   private targetUrl: string;
   private tempDirectory: string;
   private workingDirectory: string;
@@ -279,11 +299,13 @@ export class LighthouseTask {
   private defineLighthouseCliArgs() {
     const argsStr = taskLibrary.getInput('args', false) || '';
     const args = LighthouseCliArgumentSanitizer.sanitize(argsStr);
+    const chromeFlagsStr = taskLibrary.getInput('chromeFlags', false) || '';
+    const chromeFlags = LighthouseCliArgumentSanitizer.sanitizeFlags(chromeFlagsStr);
 
     args.push('--output=html');
     args.push('--output=json');
     args.push(`--output-path=${path.join(this.tempDirectory, this.baseReportName)}`);
-    args.push('--chrome-flags="--headless"');
+    args.push(`--chrome-flags=${chromeFlags.join(' ')}`);
 
     args.unshift(this.targetUrl);
 
