@@ -6,9 +6,17 @@
   "author": "GSoft",
   "helpMarkDown": "You can provide the lighthouse NPM package, otherwise it will be installed in a temporary directory.",
   "category": "Utility",
-  "visibility": ["Build", "Release"],
-  "runsOn": ["Agent", "DeploymentGroup"],
-  "demands": ["node.js"],
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent",
+    "DeploymentGroup"
+  ],
+  "demands": [
+    "node.js"
+  ],
   "version": {
     "Major": 1,
     "Minor": 0,
@@ -32,6 +40,14 @@
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "The [CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse. One argument per line.\n\n`--view`, `--output`, `--output-path`, `--chrome-flags` are prohibited and will be either removed or replaced."
+    },
+    {
+      "name": "chromeFlags",
+      "type": "string",
+      "label": "Chrome Flags",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "The [Chrome Flags](https://peter.sh/experiments/chromium-command-line-switches/) to pass to LightHouse. Set Arguments separated by space, e.g. `--disable-gpu --headless --no-sandbox`"
     },
     {
       "name": "assertions",
