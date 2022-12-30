@@ -21,7 +21,7 @@
     "@types/node": "^10.17.14",
     "husky": "^4.2.1",
     "minimist": "^1.2.3",
-    "mocha": "^7.0.1",
+    "mocha": "^10.2.0",
     "prettier": "^1.19.1",
     "pretty-quick": "^2.0.1",
     "rimraf": "^3.0.1",
