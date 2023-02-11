@@ -13,6 +13,8 @@
     "github-actions",
     "npm"
   ],
+  "autodiscover": true,
+  "autodiscoverFilter": ["gsoft-inc/azure-pipelines-lighthouse"],
   "stabilityDays": 3,
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
@@ -26,6 +28,12 @@
     {
       "matchManagers": ["github-actions"],
       "groupName": "Workflow dependencies"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackagePatterns": ["rimraf"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     },
     {
       "matchManagers": ["npm"],
