@@ -1,0 +1,20 @@
+﻿name: Renovate
+
+on:
+  # Temporarily enable manual workflow trigger for testing
+  workflow_dispatch: {}
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Renovate
+        shell: bash
+        run: npx renovate
+        env:
+          RENOVATE_CONFIG_FILE: "renovate.json"
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+          LOG_LEVEL: "debug"

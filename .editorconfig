@@ -1,4 +1,5 @@
-# All Files
+root = true
+
 [*]
 charset = utf-8
 indent_style = space
@@ -6,17 +7,8 @@ indent_size = 2
 insert_final_newline = false
 trim_trailing_whitespace = true
 
-# Markdown Files
 [*.md]
 trim_trailing_whitespace = false
 
-# Web Files
 [*.{htm,html,js,ts,css,scss,less}]
 insert_final_newline = true
-indent_size = 2
-
-[*.{yml,json}]
-indent_size = 2
-
-[*.{xml,config}]
-indent_size = 2

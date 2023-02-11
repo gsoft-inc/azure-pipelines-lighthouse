@@ -127,4 +127,4 @@ There are GitHub actions that take care of compiling, packaging and publishing t
 
 ## License
 
-Copyright © 2020, Groupe GSoft Inc. This code is licensed under the Apache License, Version 2.0. You may obtain a copy of this license at https://github.com/gsoft-inc/azure-pipelines-lighthouse/blob/master/LICENSE.
+Copyright © 2023, Groupe GSoft Inc. This code is licensed under the Apache License, Version 2.0. You may obtain a copy of this license at https://github.com/gsoft-inc/azure-pipelines-lighthouse/blob/master/LICENSE.

@@ -1,0 +1,71 @@
+name: Publish
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*.*.*"]
+    paths-ignore: ["*.md"]
+
+jobs:
+  build_package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Update extension information (dev)
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: npm run bump-version -- --token ${{ secrets.marketplace_access_token }} --release-type dev
+
+      - name: Update extension information (prod)
+        if: ${{ contains(github.ref, 'refs/tags/') }}
+        run: npm run bump-version -- --token ${{ secrets.marketplace_access_token }} --release-type hotfix
+
+      - name: Package extension
+        run: npm run package
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Extension-Package
+          path: PackageOutput
+
+  publish_marketplace:
+    name: Publish to VS Marketplace
+    needs: build_package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: Extension-Package
+          path: package
+
+      - name: Publish to VS Marketplace (dev)
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: find ./package -name '*.vsix' -exec npm run publish:dev -- -t ${{ secrets.marketplace_access_token }} --vsix {} \;
+
+      - name: Publish to VS Marketplace (prod)
+        if: ${{ contains(github.ref, 'refs/tags/') }}
+        run: find ./package -name '*.vsix' -exec npm run publish -- -t ${{ secrets.marketplace_access_token }} --vsix {} \;
