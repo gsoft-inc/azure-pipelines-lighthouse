@@ -31,6 +31,12 @@
     },
     {
       "matchManagers": ["npm"],
+      "matchPackagePatterns": ["rimraf"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["npm"],
       "groupName": "NPM dependencies"
     }
   ],
