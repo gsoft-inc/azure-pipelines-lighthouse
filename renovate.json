@@ -13,6 +13,8 @@
     "github-actions",
     "npm"
   ],
+  "autodiscover": true,
+  "autodiscoverFilter": ["gsoft-inc/azure-pipelines-lighthouse"],
   "stabilityDays": 3,
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
