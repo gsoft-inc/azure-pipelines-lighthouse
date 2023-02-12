@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
   "id": "b18196d0-d3ed-11e8-ada4-43a6658503da",
   "name": "Lighthouse",
   "friendlyName": "Lighthouse",
@@ -39,7 +40,15 @@
       "label": "CLI arguments",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "The [CLI arguments](https://github.com/GoogleChrome/lighthouse) to pass to Lighthouse. One argument per line.\n\n`--view`, `--output`, `--output-path`, `--chrome-flags` are prohibited and will be either removed or replaced."
+      "helpMarkDown": "The [CLI arguments](https://github.com/GoogleChrome/lighthouse#cli-options) to pass to Lighthouse. **One argument per line**.\n\n`--view`, `--output`, `--output-path`, `--chrome-flags` are prohibited and will be either removed or replaced."
+    },
+    {
+      "name": "chromeFlags",
+      "type": "string",
+      "label": "Chrome flags",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Custom flags to pass to Chrome (space-delimited). For a full list of flags, see [https://bit.ly/chrome-flags](https://bit.ly/chrome-flags)."
     },
     {
       "name": "assertions",
@@ -47,7 +56,7 @@
       "label": "Audit score assertions",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Allows you to write audit score assertions that can stop the pipeline if any assertion fail.\n\nWrite one assertion per line. For example:\n`no-vulnerable-libraries = 1` (expects score of `no-vulnerable-libraries` to be equal to 1)\n`speed-index > 0.5` (expects score of `speed-index` to be greater than 0.5)\n\nAudit score values are always between 0 and 1.\nYou can find the [list of available audits here](https://github.com/gsoft-inc/azure-pipelines-lighthouse#available-audits)."
+      "helpMarkDown": "Allows you to write audit score assertions that can stop the pipeline if any assertion fail.\n\n**Write one assertion per line**. For example:\n`no-vulnerable-libraries = 1` (expects score of `no-vulnerable-libraries` to be equal to 1)\n`speed-index > 0.5` (expects score of `speed-index` to be greater than 0.5)\n\nAudit score values are always between 0 and 1.\nYou can find the [list of available audits here](https://github.com/gsoft-inc/azure-pipelines-lighthouse#available-audits)."
     },
     {
       "name": "tabName",

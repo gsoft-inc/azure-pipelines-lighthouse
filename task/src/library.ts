@@ -182,6 +182,7 @@ export class LighthouseTask {
   private htmlReportPath: string;
   private jsonReportPath: string;
   private jsonMetaPath: string;
+  private chromeFlags: string;
   private cliArgs: string[];
   private auditAssertionsStr: string;
 
@@ -199,6 +200,7 @@ export class LighthouseTask {
       this.defineWorkingDirectory();
       this.defineTabName();
       this.defineOutputReportPaths();
+      this.defineChromeFlags();
       this.defineLighthouseCliArgs();
       this.defineAuditAssertions();
       await this.defineLighthouseCommand();
@@ -276,6 +278,15 @@ export class LighthouseTask {
     console.log(`Lighthouse JSON report will be saved at: ${this.jsonReportPath}`);
   }
 
+  private defineChromeFlags() {
+    this.chromeFlags = (taskLibrary.getInput('chromeFlags', false) || '').trim();
+
+    const headlessFlag = '--headless';
+    if (this.chromeFlags.indexOf(headlessFlag) === -1) {
+      this.chromeFlags = this.chromeFlags.length === 0 ? headlessFlag : headlessFlag + ' ' + this.chromeFlags;
+    }
+  }
+
   private defineLighthouseCliArgs() {
     const argsStr = taskLibrary.getInput('args', false) || '';
     const args = LighthouseCliArgumentSanitizer.sanitize(argsStr);
@@ -283,7 +294,7 @@ export class LighthouseTask {
     args.push('--output=html');
     args.push('--output=json');
     args.push(`--output-path=${path.join(this.tempDirectory, this.baseReportName)}`);
-    args.push('--chrome-flags="--headless"');
+    args.push(`--chrome-flags="${this.chromeFlags}"`);
 
     args.unshift(this.targetUrl);
 
