@@ -283,7 +283,7 @@ export class LighthouseTask {
 
     const headlessFlag = '--headless';
     if (this.chromeFlags.indexOf(headlessFlag) === -1) {
-      this.chromeFlags = headlessFlag + ' ' + this.chromeFlags;
+      this.chromeFlags = this.chromeFlags.length === 0 ? headlessFlag : headlessFlag + ' ' + this.chromeFlags;
     }
   }
 
