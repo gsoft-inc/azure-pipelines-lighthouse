@@ -23,6 +23,7 @@ jobs:
         run: |
           dotnet tool install --global GitVersion.Tool --version 5.12.0
           dotnet-gitversion /output buildserver
+          echo $GitVersion_MajorMinorPatch
 
       - name: Use Node.js 18
         uses: actions/setup-node@v3
