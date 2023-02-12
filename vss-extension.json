@@ -7,19 +7,34 @@
   "publisher": "GSoft",
   "author": "Anthony Simmon",
   "public": true,
-  "galleryFlags": ["Public"],
+  "galleryFlags": [
+    "Public"
+  ],
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "scopes": ["vso.build_execute", "vso.release_execute"],
+  "scopes": [
+    "vso.build_execute",
+    "vso.release_execute"
+  ],
   "icons": {
     "default": "static/images/extension-logo.png"
   },
-  "demands": ["api-version/3.0"],
-  "tags": ["Lighthouse", "Build", "Release", "Azure Pipelines", "Visual Studio Extensions"],
-  "categories": ["Azure Pipelines"],
+  "demands": [
+    "api-version/3.0"
+  ],
+  "tags": [
+    "Lighthouse",
+    "Build",
+    "Release",
+    "Azure Pipelines",
+    "Visual Studio Extensions"
+  ],
+  "categories": [
+    "Azure Pipelines"
+  ],
   "screenshots": [
     {
       "path": "static/images/screenshot-1.png"
@@ -107,33 +122,45 @@
       "id": "build-lighthouse-tab",
       "type": "ms.vss-build-web.build-results-tab",
       "description": "Display Google Lighthouse reports and evaluate audit scores with assertions.",
-      "targets": ["ms.vss-build-web.build-results-view"],
+      "targets": [
+        "ms.vss-build-web.build-results-view"
+      ],
       "properties": {
         "name": "Lighthouse",
         "uri": "tab-build.html",
         "registeredObjectId": "registeredEnvironmentObject",
-        "supportsTasks": ["b18196d0-d3ed-11e8-ada4-43a6658503da"],
+        "supportsTasks": [
+          "b18196d0-d3ed-11e8-ada4-43a6658503da"
+        ],
         "dynamic": true
       },
-      "includes": ["ms.vss-releaseManagement-web.release-service-data-external"]
+      "includes": [
+        "ms.vss-releaseManagement-web.release-service-data-external"
+      ]
     },
     {
       "id": "release-stage-lighthouse-tab",
       "type": "ms.vss-web.tab",
       "description": "Display Google Lighthouse reports and evaluate audit scores with assertions.",
-      "targets": ["ms.vss-releaseManagement-web.release-environment-editor-tab"],
+      "targets": [
+        "ms.vss-releaseManagement-web.release-environment-editor-tab"
+      ],
       "properties": {
         "name": "Lighthouse",
         "uri": "tab-release.html",
         "registeredObjectId": "registeredEnvironmentObject",
         "dynamic": true
       },
-      "includes": ["ms.vss-releaseManagement-web.release-service-data-external"]
+      "includes": [
+        "ms.vss-releaseManagement-web.release-service-data-external"
+      ]
     },
     {
       "id": "Lighthouse",
       "type": "ms.vss-distributed-task.task",
-      "targets": ["ms.vss-distributed-task.tasks"],
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
       "properties": {
         "name": "Tasks/Lighthouse"
       }
