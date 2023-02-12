@@ -22,9 +22,6 @@ jobs:
       - name: GitVersion
         run: dotnet tool install --global GitVersion.Tool --version 5.12.0 && dotnet-gitversion /output buildserver
 
-      - name: GitVersion test
-        run: echo "${{ env.GitVersion_MajorMinorPatch }}"
-
       - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
@@ -34,7 +31,7 @@ jobs:
         run: npm ci
 
       - name: Update extension information
-        run: npm run updateversion -- --environment dev --version 1.0.0
+        run: npm run updateversion -- --environment dev --version "${{ env.GitVersion_MajorMinorPatch }}"
 
       - name: Run tests
         run: npm run test
