@@ -339,9 +339,10 @@ export class LighthouseTask {
   }
 
   private getLocallyInstalledLighthouseExecPath(): string {
-    const nodeModulesPath = path.join(this.workingDirectory, 'node_modules');
-    const execPath = path.join(nodeModulesPath, 'lighthouse', 'lighthouse-cli', 'index.js');
-    return fs.existsSync(execPath) ? execPath : '';
+    const execPathPostLH10 = path.join(this.workingDirectory, 'node_modules', 'lighthouse', 'cli', 'index.js');
+    const execPathPreLH10 = path.join(this.workingDirectory, 'node_modules', 'lighthouse', 'lighthouse-cli', 'index.js');
+
+    return fs.existsSync(execPathPostLH10) ? execPathPostLH10 : fs.existsSync(execPathPreLH10) ? execPathPreLH10 : '';
   }
 
   private getGloballyInstalledLighthouseExecPath(): string {
@@ -350,8 +351,11 @@ export class LighthouseTask {
   }
 
   private async locallyInstallAndGetLighthouseExecPath() {
-    const execPath = path.join(this.tempDirectory, 'node_modules', 'lighthouse', 'lighthouse-cli', 'index.js');
-    if (fs.existsSync(execPath)) return execPath;
+    const execPathPostLH10 = path.join(this.tempDirectory, 'node_modules', 'lighthouse', 'cli', 'index.js');
+    const execPathPreLH10 = path.join(this.tempDirectory, 'node_modules', 'lighthouse', 'lighthouse-cli', 'index.js');
+
+    if (fs.existsSync(execPathPostLH10)) return execPathPostLH10;
+    if (fs.existsSync(execPathPreLH10)) return execPathPreLH10;
 
     console.log('Existing Lighthouse installation not found');
     console.log(`Lighthouse will be installed using NPM at: ${this.tempDirectory}`);
@@ -361,7 +365,7 @@ export class LighthouseTask {
     const npmResultCode = await npmCommand.exec();
     console.log(`Installing Lighthouse with NPM returned: ${npmResultCode}`);
 
-    return fs.existsSync(execPath) ? execPath : '';
+    return fs.existsSync(execPathPostLH10) ? execPathPostLH10 : fs.existsSync(execPathPreLH10) ? execPathPreLH10 : '';
   }
 
   private async executeLighthouse() {
