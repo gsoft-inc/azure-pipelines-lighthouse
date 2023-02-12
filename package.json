@@ -2,11 +2,12 @@
   "name": "lighthouse-vsts",
   "scripts": {
     "postinstall": "cd task && npm install",
-    "package": "rimraf *.vsix && tsc -p task && tsc -p web && tfx extension create --output-path PackageOutput",
-    "bump-version": "node version-bump.js",
-    "publish": "tfx extension publish --publisher gsoft",
+    "build": "tsc -p task && tsc -p web",
+    "test": "npm run build && mocha task/test",
+    "updateversion": "node update-version.js",
+    "package": "npm run build && rimraf *.vsix && tfx extension create --output-path .output/",
     "publish:dev": "tfx extension publish --publisher gsoft-dev",
-    "test": "mocha task/test"
+    "publish:prod": "tfx extension publish --publisher gsoft"
   },
   "husky": {
     "hooks": {
