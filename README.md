@@ -32,7 +32,7 @@ Lighthouse for Azure Pipelines can be installed from the [Visual Studio Marketpl
 
 ## Available audits
 
-The following audits exist in Lighthouse 5.6.0. More may be added in the future.
+The following audits exist in Lighthouse 5.6.0. They may change with new versions. Execute `lighthouse --list-all-audits` to discover the available audits for your desired Lighthouse version.
 
 | Audit                              | Type    | Description                                                                                                                        |
 | ---------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
