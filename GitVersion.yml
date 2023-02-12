@@ -1,4 +1,6 @@
-mode: Mainline
+mode: ContinuousDeployment
+commit-message-incrementing: Disabled
+continuous-delivery-fallback-tag: ""
 branches:
   main:
     regex: ^main$
