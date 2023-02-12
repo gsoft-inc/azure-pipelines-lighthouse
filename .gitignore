@@ -107,3 +107,4 @@ jspm_packages/
 task/**/*.js
 web/**/*.js
 .taskkey
+.output/

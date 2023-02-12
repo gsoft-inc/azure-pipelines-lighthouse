@@ -5,9 +5,9 @@
     "build": "tsc -p task && tsc -p web",
     "test": "npm run build && mocha task/test",
     "updateversion": "node update-version.js",
-    "package": "npm run build && rimraf *.vsix && tfx extension create --output-path PackageOutput",
-    "publish": "tfx extension publish --publisher gsoft",
-    "publish:dev": "tfx extension publish --publisher gsoft-dev"
+    "package": "npm run build && rimraf *.vsix && tfx extension create --output-path .output/",
+    "publish:dev": "tfx extension publish --publisher gsoft-dev",
+    "publish:prod": "tfx extension publish --publisher gsoft"
   },
   "husky": {
     "hooks": {
