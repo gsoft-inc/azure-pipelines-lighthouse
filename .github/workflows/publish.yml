@@ -7,11 +7,21 @@ on:
     paths-ignore: ["*.md"]
 
 jobs:
-  build_package:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "6.0.x"
+
+      - name: GitVersion
+        run: dotnet tool install --global GitVersion.Tool --version 5.12.0 && dotnet-gitversion /output buildserver
 
       - name: Use Node.js 18
         uses: actions/setup-node@v3
@@ -23,49 +33,22 @@ jobs:
 
       - name: Update extension information (dev)
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: npm run bump-version -- --token ${{ secrets.marketplace_access_token }} --release-type dev
+        run: npm run updateversion -- --environment dev --version "${{ env.GitVersion_MajorMinorPatch }}"
 
       - name: Update extension information (prod)
         if: ${{ contains(github.ref, 'refs/tags/') }}
-        run: npm run bump-version -- --token ${{ secrets.marketplace_access_token }} --release-type hotfix
-
-      - name: Package extension
-        run: npm run package
+        run: npm run updateversion -- --environment prod --version "${{ env.GitVersion_MajorMinorPatch }}"
 
       - name: Run tests
         run: npm run test
 
-      - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: Extension-Package
-          path: PackageOutput
-
-  publish_marketplace:
-    name: Publish to VS Marketplace
-    needs: build_package
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install NPM dependencies
-        run: npm ci
-
-      - name: Download VSIX artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: Extension-Package
-          path: package
+      - name: Package extension
+        run: npm run package
 
       - name: Publish to VS Marketplace (dev)
         if: ${{ github.ref == 'refs/heads/main' }}
-        run: find ./package -name '*.vsix' -exec npm run publish:dev -- -t ${{ secrets.marketplace_access_token }} --vsix {} \;
+        run: find .output/ -name '*.vsix' -exec npm run publish:dev -- -t ${{ secrets.marketplace_access_token }} --vsix {} \;
 
       - name: Publish to VS Marketplace (prod)
         if: ${{ contains(github.ref, 'refs/tags/') }}
-        run: find ./package -name '*.vsix' -exec npm run publish -- -t ${{ secrets.marketplace_access_token }} --vsix {} \;
+        run: find .output/ -name '*.vsix' -exec npm run publish:prod -- -t ${{ secrets.marketplace_access_token }} --vsix {} \;

@@ -7,9 +7,17 @@
   "author": "GSoft",
   "helpMarkDown": "You can provide the lighthouse NPM package, otherwise it will be installed in a temporary directory.",
   "category": "Utility",
-  "visibility": ["Build", "Release"],
-  "runsOn": ["Agent", "DeploymentGroup"],
-  "demands": ["node.js"],
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "runsOn": [
+    "Agent",
+    "DeploymentGroup"
+  ],
+  "demands": [
+    "node.js"
+  ],
   "version": {
     "Major": 1,
     "Minor": 0,
