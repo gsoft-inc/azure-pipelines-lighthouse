@@ -14,14 +14,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "6.0.x"
-
-      - name: GitVersion
-        run: dotnet tool install --global GitVersion.Tool --version 5.12.0 && dotnet-gitversion /output buildserver
-
       - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
@@ -31,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: Update extension information
-        run: npm run updateversion -- --environment dev --version "${{ env.GitVersion_MajorMinorPatch }}"
+        run: npm run updateversion -- --environment dev --version "1.0.0"
 
       - name: Run tests
         run: npm run test

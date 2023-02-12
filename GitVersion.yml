@@ -1,5 +1,0 @@
-mode: Mainline
-branches:
-  main:
-    regex: ^main$
-    source-branches: []
