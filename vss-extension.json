@@ -5,7 +5,7 @@
   "name": "Lighthouse",
   "description": "Display Google Lighthouse reports and evaluate audit scores with assertions.",
   "publisher": "GSoft",
-  "author": "Anthony Simmon",
+  "author": "GSoft Group Inc.",
   "public": true,
   "galleryFlags": [
     "Public"
