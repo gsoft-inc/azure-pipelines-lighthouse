@@ -40,14 +40,14 @@ async function updateJsonContent(filePath, update) {
 }
 
 const environments = new Set(['dev', 'prod']);
-const versionRegex = /^([0-9]+)\.([0-9]+)\.([0-9]+)$/;
+const versionRegex = /^[vV]?([0-9]+)\.([0-9]+)\.([0-9]+)$/;
 
 const run = async args => {
   const version = args.version || '';
   const environment = args.environment || '';
 
   if (!versionRegex.test(version)) {
-    throw new Error('Argument --version is missing or invalid (x.y.z)');
+    throw new Error('Argument --version is missing or invalid (x.y.z or vx.y.z)');
   }
 
   if (!environments.has(environment)) {
