@@ -11,6 +11,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "6.0.x"
+
+      - name: GitVersion
+        run: |
+          dotnet tool install --global GitVersion.Tool --version 5.12.0
+          dotnet-gitversion /output buildserver
 
       - name: Use Node.js 18
         uses: actions/setup-node@v3
@@ -20,8 +32,11 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
 
-      - name: Package extension
-        run: npm run package
+      - name: Update extension information
+        run: npm run updateversion -- --environment dev --version 1.0.0
 
       - name: Run tests
         run: npm run test
+
+      - name: Package extension
+        run: npm run package

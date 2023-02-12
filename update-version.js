@@ -43,13 +43,8 @@ const environments = new Set(['dev', 'prod']);
 const versionRegex = /^([0-9]+)\.([0-9]+)\.([0-9]+)$/;
 
 const run = async args => {
-  const token = args.token || '';
   const version = args.version || '';
   const environment = args.environment || '';
-
-  if (token === '') {
-    throw new Error('Argument --token is missing (Azure DevOps PAT token for VS Marketplace)');
-  }
 
   if (!versionRegex.test(version)) {
     throw new Error('Argument --version is missing or invalid (x.y.z)');
@@ -102,7 +97,7 @@ const run = async args => {
 };
 
 const args = minimist(process.argv.slice(2), {
-  string: ['token', 'version', 'environment'],
+  string: ['version', 'environment'],
   default: { }
 });
 

@@ -1,0 +1,6 @@
+mode: Mainline
+commit-message-incrementing: Disabled
+branches:
+  main:
+    regex: ^(master|main)$
+    source-branches: []
