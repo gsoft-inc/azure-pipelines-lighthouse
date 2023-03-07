@@ -1,6 +1,6 @@
 {
   "private": true,
   "dependencies": {
-    "azure-pipelines-task-lib": "4.2.0"
+    "azure-pipelines-task-lib": "4.3.0"
   }
 }
