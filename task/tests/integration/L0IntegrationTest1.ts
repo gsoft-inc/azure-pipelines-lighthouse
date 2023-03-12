@@ -6,7 +6,7 @@ import * as assert from 'assert';
 
 import {TaskMockRunner} from "azure-pipelines-task-lib/mock-run";
 
-const taskPath = path.join(__dirname, '..', 'src', 'task.js');
+const taskPath = path.join(__dirname, '..', '..', 'src', 'task.js');
 const tmr = new TaskMockRunner(taskPath);
 
 const agentTempDir = os.tmpdir();
@@ -61,7 +61,7 @@ Object.assign(fsClone, {
   },
   readFileSync(path: string) {
     assert.strictEqual(path, jsonReportPath);
-    return '';
+    return '{}';
   }
 });
 

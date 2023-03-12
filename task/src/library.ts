@@ -207,8 +207,10 @@ export class LighthouseTask {
       await this.executeLighthouse();
       this.readJsonReport();
       this.processCriticalAudits();
+      console.log('Lighthouse task finished');
     } catch (err) {
       tl.setResult(tl.TaskResult.Failed, err.message);
+      console.error(err);
     } finally {
       if (tl.exist(this.htmlReportPath)) {
         this.addLighthouseHtmlAttachment();

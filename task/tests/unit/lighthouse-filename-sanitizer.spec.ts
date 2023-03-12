@@ -1,7 +1,7 @@
 import 'mocha';
 
 import * as assert from 'assert';
-import { ReportFilenameSanitizer } from '../src/library';
+import { ReportFilenameSanitizer } from '../../src/library';
 
 describe('ReportFilenameSanitizer', () => {
   function assertSanitized(urlStr: string, expectedOutput: string) {

@@ -1,7 +1,7 @@
 import 'mocha';
 
 import assert = require('assert');
-import { AuditAssertion } from '../src/library';
+import { AuditAssertion } from '../../src/library';
 
 describe('AuditAssertion tests', () => {
   function assertParseAssertionShouldThrow(assertionStr: string) {

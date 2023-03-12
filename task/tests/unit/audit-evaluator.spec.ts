@@ -1,7 +1,7 @@
 import 'mocha';
 
 import * as assert from 'assert';
-import { AuditEvaluator } from '../src/library';
+import { AuditEvaluator } from '../../src/library';
 
 describe('AuditEvaluator', () => {
   function assertInvalidArguments(report: object, assertionStr: string) {
