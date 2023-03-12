@@ -1,7 +1,7 @@
 import 'mocha';
 
 import assert = require('assert');
-import { LighthouseCliArgumentSanitizer } from '../src/library';
+import { LighthouseCliArgumentSanitizer } from '../../src/library';
 
 describe('LighthouseCliArgumentSanitizer tests', () => {
   function assertSanitize(argsStr: string, expectedOutput: string[]) {

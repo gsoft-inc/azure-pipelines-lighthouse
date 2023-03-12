@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as url from 'url';
 import * as path from 'path';
 
-import * as taskLibrary from 'azure-pipelines-task-lib/task';
+import * as tl from 'azure-pipelines-task-lib/task';
 import { ToolRunner } from 'azure-pipelines-task-lib/toolrunner';
 
 export class AuditAssertion {
@@ -207,33 +207,35 @@ export class LighthouseTask {
       await this.executeLighthouse();
       this.readJsonReport();
       this.processCriticalAudits();
+      console.log('Lighthouse task finished');
     } catch (err) {
-      taskLibrary.setResult(taskLibrary.TaskResult.Failed, err.message);
+      tl.setResult(tl.TaskResult.Failed, err.message);
+      console.error(err);
     } finally {
-      if (fs.existsSync(this.htmlReportPath)) {
+      if (tl.exist(this.htmlReportPath)) {
         this.addLighthouseHtmlAttachment();
       }
     }
   }
 
   private ensureNodeAndNpmToolsAreAvailable() {
-    this.nodeExecPath = taskLibrary.which('node', true);
+    this.nodeExecPath = tl.which('node', true);
     console.log(`Node.js found at: ${this.nodeExecPath}`);
 
-    this.npmExecPath = taskLibrary.which('npm', true);
+    this.npmExecPath = tl.which('npm', true);
     console.log(`NPM found at: ${this.npmExecPath}`);
   }
 
   private ensureTemporaryDirectoryExists() {
-    const agentTempDirectory = taskLibrary.getVariable('agent.tempDirectory');
+    const agentTempDirectory = tl.getVariable('agent.tempDirectory');
     this.tempDirectory = path.join(agentTempDirectory, LighthouseTask.TASK_TEMP_FOLDER);
 
-    taskLibrary.mkdirP(this.tempDirectory);
+    tl.mkdirP(this.tempDirectory);
     console.log(`Temporary directory: ${this.tempDirectory}`);
   }
 
   private defineLighthouseTargetUrl() {
-    this.targetUrl = taskLibrary.getInput('url', true).trim();
+    this.targetUrl = tl.getInput('url', true).trim();
     if (this.targetUrl.length === 0) {
       throw new Error('Target URL cannot be empty');
     }
@@ -242,8 +244,8 @@ export class LighthouseTask {
   }
 
   private defineWorkingDirectory() {
-    const sourceDirectory = taskLibrary.getVariable('build.sourceDirectory') || taskLibrary.getVariable('build.sourcesDirectory');
-    this.workingDirectory = taskLibrary.getInput('cwd', false) || sourceDirectory;
+    const sourceDirectory = tl.getVariable('build.sourceDirectory') || tl.getVariable('build.sourcesDirectory');
+    this.workingDirectory = tl.getInput('cwd', false) || sourceDirectory;
     if (!this.workingDirectory) {
       throw new Error('Working directory is not defined');
     }
@@ -253,7 +255,7 @@ export class LighthouseTask {
   }
 
   private defineTabName() {
-    const userDefinedTabName = (taskLibrary.getInput('tabName', false) || '').trim();
+    const userDefinedTabName = (tl.getInput('tabName', false) || '').trim();
     if (userDefinedTabName.length > 0) {
       this.tabName = userDefinedTabName;
     } else {
@@ -267,9 +269,8 @@ export class LighthouseTask {
 
   private defineOutputReportPaths() {
     const urlAsFilename = ReportFilenameSanitizer.makeFilenameFromUrl(this.targetUrl);
-    const randomNumber = Math.trunc(Math.random() * (99999 - 10000) + 10000);
-
-    this.baseReportName = `${urlAsFilename}-${randomNumber}`;
+    const reportSuffix = Number(tl.getVariable('LIGHTHOUSE_REPORT_SUFFIX')) || Math.trunc(Math.random() * (99999 - 10000) + 10000);
+    this.baseReportName = `${urlAsFilename}-${reportSuffix}`;
     this.htmlReportPath = path.join(this.tempDirectory, `${this.baseReportName}.report.html`);
     this.jsonReportPath = path.join(this.tempDirectory, `${this.baseReportName}.report.json`);
     this.jsonMetaPath = path.join(this.tempDirectory, `${this.baseReportName}.meta.json`);
@@ -279,7 +280,7 @@ export class LighthouseTask {
   }
 
   private defineChromeFlags() {
-    this.chromeFlags = (taskLibrary.getInput('chromeFlags', false) || '').trim();
+    this.chromeFlags = (tl.getInput('chromeFlags', false) || '').trim();
 
     const headlessFlag = '--headless';
     if (this.chromeFlags.indexOf(headlessFlag) === -1) {
@@ -288,7 +289,7 @@ export class LighthouseTask {
   }
 
   private defineLighthouseCliArgs() {
-    const argsStr = taskLibrary.getInput('args', false) || '';
+    const argsStr = tl.getInput('args', false) || '';
     const args = LighthouseCliArgumentSanitizer.sanitize(argsStr);
 
     args.push('--output=html');
@@ -309,7 +310,7 @@ export class LighthouseTask {
     if (execPath) {
       console.log(`Locally installed Lighthouse found at ${execPath}`);
       args.unshift(execPath);
-      this.lighthouseCommand = taskLibrary.tool(this.nodeExecPath);
+      this.lighthouseCommand = tl.tool(this.nodeExecPath);
       this.lighthouseCommand.line(args.join(' '));
       return;
     }
@@ -317,7 +318,7 @@ export class LighthouseTask {
     execPath = this.getGloballyInstalledLighthouseExecPath();
     if (execPath) {
       console.log(`Globally installed Lighthouse found at ${execPath}`);
-      this.lighthouseCommand = taskLibrary.tool(execPath);
+      this.lighthouseCommand = tl.tool(execPath);
       this.lighthouseCommand.line(args.join(' '));
       return;
     }
@@ -326,7 +327,7 @@ export class LighthouseTask {
     if (execPath) {
       console.log(`Locally installed Lighthouse found at ${execPath}`);
       args.unshift(execPath);
-      this.lighthouseCommand = taskLibrary.tool(this.nodeExecPath);
+      this.lighthouseCommand = tl.tool(this.nodeExecPath);
       this.lighthouseCommand.line(args.join(' '));
       return;
     }
@@ -335,48 +336,48 @@ export class LighthouseTask {
   }
 
   private defineAuditAssertions() {
-    this.auditAssertionsStr = taskLibrary.getInput('assertions', false) || '';
+    this.auditAssertionsStr = tl.getInput('assertions', false) || '';
   }
 
   private getLocallyInstalledLighthouseExecPath(): string {
     const execPathPostLH10 = path.join(this.workingDirectory, 'node_modules', 'lighthouse', 'cli', 'index.js');
     const execPathPreLH10 = path.join(this.workingDirectory, 'node_modules', 'lighthouse', 'lighthouse-cli', 'index.js');
 
-    return fs.existsSync(execPathPostLH10) ? execPathPostLH10 : fs.existsSync(execPathPreLH10) ? execPathPreLH10 : '';
+    return tl.exist(execPathPostLH10) ? execPathPostLH10 : tl.exist(execPathPreLH10) ? execPathPreLH10 : '';
   }
 
   private getGloballyInstalledLighthouseExecPath(): string {
-    const execPath = taskLibrary.which('lighthouse', false);
-    return fs.existsSync(execPath) ? execPath : '';
+    const execPath = tl.which('lighthouse', false);
+    return tl.exist(execPath) ? execPath : '';
   }
 
   private async locallyInstallAndGetLighthouseExecPath() {
     const execPathPostLH10 = path.join(this.tempDirectory, 'node_modules', 'lighthouse', 'cli', 'index.js');
     const execPathPreLH10 = path.join(this.tempDirectory, 'node_modules', 'lighthouse', 'lighthouse-cli', 'index.js');
 
-    if (fs.existsSync(execPathPostLH10)) return execPathPostLH10;
-    if (fs.existsSync(execPathPreLH10)) return execPathPreLH10;
+    if (tl.exist(execPathPostLH10)) return execPathPostLH10;
+    if (tl.exist(execPathPreLH10)) return execPathPreLH10;
 
     console.log('Existing Lighthouse installation not found');
     console.log(`Lighthouse will be installed using NPM at: ${this.tempDirectory}`);
-    const npmCommand = taskLibrary.tool(this.npmExecPath);
+    const npmCommand = tl.tool(this.npmExecPath);
     npmCommand.arg(['install', 'lighthouse', '--prefix', this.tempDirectory, '--loglevel=error']);
 
     const npmResultCode = await npmCommand.exec();
     console.log(`Installing Lighthouse with NPM returned: ${npmResultCode}`);
 
-    return fs.existsSync(execPathPostLH10) ? execPathPostLH10 : fs.existsSync(execPathPreLH10) ? execPathPreLH10 : '';
+    return tl.exist(execPathPostLH10) ? execPathPostLH10 : tl.exist(execPathPreLH10) ? execPathPreLH10 : '';
   }
 
   private async executeLighthouse() {
     console.log('Executing Lighthouse...');
     const retCode = await this.lighthouseCommand.exec();
 
-    if (!fs.existsSync(this.jsonReportPath)) {
+    if (!tl.exist(this.jsonReportPath)) {
       throw new Error(`Lighthouse did not generate a JSON output. Error code: ${retCode}`);
     }
 
-    if (!fs.existsSync(this.htmlReportPath)) {
+    if (!tl.exist(this.htmlReportPath)) {
       throw new Error(`Lighthouse did not generate a HTML output. Error code: ${retCode}`);
     }
 
@@ -396,16 +397,16 @@ export class LighthouseTask {
     fs.writeFileSync(this.jsonMetaPath, JSON.stringify(metaContents));
 
     console.log('Adding the JSON meta result as attachment of this build / release');
-    taskLibrary.addAttachment('lighthouse_meta_result', metaFileName, this.jsonMetaPath);
+    tl.addAttachment('lighthouse_meta_result', metaFileName, this.jsonMetaPath);
 
     console.log('Adding the HTML report as attachment of this build / release');
-    taskLibrary.addAttachment('lighthouse_html_result', reportFileName, this.htmlReportPath);
+    tl.addAttachment('lighthouse_html_result', reportFileName, this.htmlReportPath);
 
     console.log('Uploading the HTML report so it can be downloaded from all logs');
-    taskLibrary.uploadFile(this.htmlReportPath);
+    tl.uploadFile(this.htmlReportPath);
 
     console.log('Uploading the JSON report so it can be downloaded from all logs');
-    taskLibrary.uploadFile(this.jsonReportPath);
+    tl.uploadFile(this.jsonReportPath);
   }
 
   private readJsonReport() {

@@ -3,7 +3,7 @@
   "scripts": {
     "postinstall": "cd task && npm install",
     "build": "tsc -p task && tsc -p web",
-    "test": "npm run build && mocha task/test",
+    "test": "npm run build && mocha task/tests/**/*.spec.js",
     "updateversion": "node update-version.js",
     "package": "npm run build && rimraf *.vsix && tfx extension create --output-path .output/",
     "publish:dev": "tfx extension publish --publisher gsoft-dev",
