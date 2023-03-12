@@ -18,7 +18,6 @@ const inputUrl = 'https://www.google.com/';
 const lhTempDir = path.join(agentTempDir, '__lighthouse');
 const lhLocalPre10ExePath = path.join(lhTempDir, 'node_modules', 'lighthouse', 'lighthouse-cli', 'index.js');
 const lhLocalPost10ExePath = path.join(lhTempDir, 'node_modules', 'lighthouse', 'cli', 'index.js');
-const lhLocalInstallCmd = `${npmExePath} install lighthouse --prefix ${lhTempDir} --loglevel=error`;
 const lhLocalExecCmd = `${nodeExePath} ${lhLocalPost10ExePath} ${inputUrl} --quiet --output=html --output=json --output-path=${path.join(lhTempDir, 'www.google.com-12345')} --chrome-flags=--headless`;
 const htmlReportPath = path.join(lhTempDir, 'www.google.com-12345.report.html');
 const jsonReportPath = path.join(lhTempDir, 'www.google.com-12345.report.json');
@@ -40,10 +39,6 @@ tmr.setAnswers({
     [npmExePath]: true,
   },
   exec: {
-    [lhLocalInstallCmd]: {
-      code: 0,
-      stdout: ''
-    },
     [lhLocalExecCmd]: {
       code: 0,
       stdout: ''
