@@ -269,8 +269,8 @@ export class LighthouseTask {
 
   private defineOutputReportPaths() {
     const urlAsFilename = ReportFilenameSanitizer.makeFilenameFromUrl(this.targetUrl);
-    const randomNumber = Number(tl.getVariable('LIGHTHOUSE_REPORT_SUFFIX')) || Math.trunc(Math.random() * (99999 - 10000) + 10000);
-    this.baseReportName = `${urlAsFilename}-${randomNumber}`;
+    const reportSuffix = Number(tl.getVariable('LIGHTHOUSE_REPORT_SUFFIX')) || Math.trunc(Math.random() * (99999 - 10000) + 10000);
+    this.baseReportName = `${urlAsFilename}-${reportSuffix}`;
     this.htmlReportPath = path.join(this.tempDirectory, `${this.baseReportName}.report.html`);
     this.jsonReportPath = path.join(this.tempDirectory, `${this.baseReportName}.report.json`);
     this.jsonMetaPath = path.join(this.tempDirectory, `${this.baseReportName}.meta.json`);
