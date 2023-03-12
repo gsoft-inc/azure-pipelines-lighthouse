@@ -15,14 +15,14 @@ const nodeExePath = process.execPath;
 const npmExePath = path.resolve(path.dirname(nodeExePath), process.platform === 'win32' ? 'npm.bat' : 'npm');
 
 const inputUrl = 'https://www.google.com/';
-const lhTempDir = `${agentTempDir}/__lighthouse`;
-const lhLocalPre10ExePath = `${lhTempDir}/node_modules/lighthouse/lighthouse-cli/index.js`;
-const lhLocalPost10ExePath = `${lhTempDir}/node_modules/lighthouse/cli/index.js`;
+const lhTempDir = path.join(agentTempDir, '__lighthouse');
+const lhLocalPre10ExePath = path.join(lhTempDir, 'node_modules', 'lighthouse', 'lighthouse-cli', 'index.js');
+const lhLocalPost10ExePath = path.join(lhTempDir, 'node_modules', 'lighthouse', 'cli', 'index.js');
 const lhLocalInstallCmd = `${npmExePath} install lighthouse --prefix ${lhTempDir} --loglevel=error`;
-const lhLocalExecCmd = `${nodeExePath} ${lhLocalPost10ExePath} ${inputUrl} --quiet --output=html --output=json --output-path=${lhTempDir}/www.google.com-12345 --chrome-flags=--headless`;
-const htmlReportPath = `${lhTempDir}/www.google.com-12345.report.html`;
-const jsonReportPath = `${lhTempDir}/www.google.com-12345.report.json`;
-const jsonMetaPath = `${lhTempDir}/www.google.com-12345.meta.json`;
+const lhLocalExecCmd = `${nodeExePath} ${lhLocalPost10ExePath} ${inputUrl} --quiet --output=html --output=json --output-path=${path.join(lhTempDir, 'www.google.com-12345')} --chrome-flags=--headless`;
+const htmlReportPath = path.join(lhTempDir, 'www.google.com-12345.report.html');
+const jsonReportPath = path.join(lhTempDir, 'www.google.com-12345.report.json');
+const jsonMetaPath = path.join(lhTempDir, 'www.google.com-12345.meta.json');
 
 tmr.setAnswers({
   exist: {
