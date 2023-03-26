@@ -12,7 +12,7 @@ Otherwise, it will install the latest version in a temporary folder.
 
 You can also specify **audit score assertions** that can make the pipeline fail based on the audit scores.
 
-For example, the Google Lighthouse audit `is-on-https` produces a boolean score that will be equal to `1` if there are no known vulnerabilities within client-side JavaScript libraries and frameworks detected on a web site.
+For example, the Google Lighthouse audit `is-on-https` produces a boolean score that will be equal to `1` if the site uses HTTPS.
 This is an example of a score assertion for this audit:
 
 ```
@@ -125,9 +125,9 @@ Execute `lighthouse --list-all-audits` to discover the available audits for your
 | bf-cache                     | binary  | Page prevented back/forward cache restoration                                                                                      |
 
 
-## Compiling
+## Build and release process
 
-There are GitHub actions that take care of compiling, packaging and publishing the extension.
+There are GitHub actions that take care of testing, packaging and publishing the extension.
 
 ## License
 
