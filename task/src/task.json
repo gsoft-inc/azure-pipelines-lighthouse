@@ -37,7 +37,7 @@
     {
       "name": "args",
       "type": "multiLine",
-      "label": "CLI arguments",
+      "label": "CLI arguments (one per line)",
       "defaultValue": "",
       "required": false,
       "helpMarkDown": "The [CLI arguments](https://github.com/GoogleChrome/lighthouse#cli-options) to pass to Lighthouse. **One argument per line**.\n\n`--view`, `--output`, `--output-path`, `--chrome-flags` are prohibited and will be either removed or replaced."
