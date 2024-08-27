@@ -1,49 +1,7 @@
-﻿{
+{
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "platform": "github",
-  "labels": ["renovate"],
   "extends": [
-    "config:base",
-    "group:definitelyTyped",
-    ":rebaseStalePrs",
-    ":pinDevDependencies",
-    ":pinDependencies"
-  ],
-  "enabledManagers": [
-    "github-actions",
-    "npm"
-  ],
-  "autodiscover": true,
-  "autodiscoverFilter": ["gsoft-inc/azure-pipelines-lighthouse"],
-  "stabilityDays": 3,
-  "prHourlyLimit": 0,
-  "prConcurrentLimit": 0,
-  "branchConcurrentLimit": 0,
-  "dependencyDashboard": false,
-  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
-  "lockFileMaintenance": {
-    "enabled": true
-  },
-  "packageRules": [
-    {
-      "matchManagers": ["github-actions"],
-      "groupName": "Workflow dependencies"
-    },
-    {
-      "matchManagers": ["npm"],
-      "matchPackagePatterns": ["rimraf"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
-    },
-    {
-      "matchManagers": ["npm"],
-      "groupName": "NPM dependencies"
-    }
-  ],
-  "vulnerabilityAlerts": {
-    "enabled": true,
-    "labels": [
-      "security"
-    ]
-  }
+    "github>gsoft-inc/renovate-config",
+    "group:definitelyTyped"
+  ]
 }
