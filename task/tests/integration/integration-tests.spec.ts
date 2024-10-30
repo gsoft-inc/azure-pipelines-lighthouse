@@ -25,10 +25,9 @@ describe('LighthouseV1 suite', function () {
 
       // As of today (2023-03-12), azure-pipelines-task-lib testing framework doesn't support Node 18
       // https://github.com/microsoft/azure-pipelines-task-lib/blob/149de35abb4ee930cf512c3d88d9178f277fb3fe/node/mock-test.ts#L156
-      tr.runAsync(16).then(() => {
-        assert(tr.invokedToolCount === 1, 'Should have only run lighthouse');
-        assert(tr.succeeded, 'Task should have succeeded, stdout: ' + tr.stdout);
-      });
+      await tr.runAsync(16);
+      assert(tr.invokedToolCount === 1, 'Should have only run lighthouse');
+      assert(tr.succeeded, 'Task should have succeeded, stdout: ' + tr.stdout);
     });
   }
 });
