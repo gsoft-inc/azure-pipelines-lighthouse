@@ -18,7 +18,7 @@
     "vss-web-extension-sdk": "5.141.0"
   },
   "devDependencies": {
-    "@types/mocha": "10.0.9",
+    "@types/mocha": "10.0.10",
     "@types/node": "20.17.6",
     "husky": "9.1.7",
     "minimist": "1.2.8",
