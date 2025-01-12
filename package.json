@@ -28,6 +28,6 @@
     "rimraf": "3.0.2",
     "tfx-cli": "0.18.0",
     "ts-node": "10.9.2",
-    "typescript": "5.7.2"
+    "typescript": "5.7.3"
   }
 }
